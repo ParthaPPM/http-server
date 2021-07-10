@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="02e18649-a9aa-4611-a3d6-a030ebbc9e52" name="Default Changelist" comment="Initial Merge">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="02e18649-a9aa-4611-a3d6-a030ebbc9e52" name="Default Changelist" comment="Added the RequestProcessor class and made some changed to the code as required. Also made some changes to the package.">
+      <change afterPath="$PROJECT_DIR$/src/com/ppm/server/http/PartialResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/ppm/server/http/RequestProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ppm/server/http/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ppm/server/http/RequestHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ppm/server/http/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ppm/server/http/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ppm/server/https/HTTPSServer1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/ppm/server/http/HTTPSServer1.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,8 +30,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1q1Uc39JJ4fE7oTcg0jOEIepX5D" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
@@ -86,8 +102,9 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.selected.configurable" value="file.status.colors" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -123,6 +140,14 @@
       <option name="presentableId" value="Default" />
       <updated>1616246667748</updated>
     </task>
+    <task id="LOCAL-00001" summary="Unimportant files and folders added to gitignore file">
+      <created>1625768879523</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1625768879523</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,10 +175,13 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
     <MESSAGE value="Initial Merge" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial Merge" />
+    <MESSAGE value="Unimportant files and folders added to gitignore file" />
+    <MESSAGE value="Added the RequestProcessor class and made some changed to the code as required. Also made some changes to the package." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added the RequestProcessor class and made some changed to the code as required. Also made some changes to the package." />
   </component>
 </project>

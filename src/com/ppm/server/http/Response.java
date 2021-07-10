@@ -42,14 +42,7 @@ class Response
 
 	byte[] getBody()
 	{
-		if(body == null)
-		{
-			return new byte[0];
-		}
-		else
-		{
-			return body;
-		}
+		return body;
 	}
 
 	public String toString()

@@ -1,4 +1,4 @@
-package com.ppm.server.https;
+package com.ppm.server.http;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

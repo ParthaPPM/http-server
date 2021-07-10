@@ -17,11 +17,13 @@ public class RequestHandler
 {
 	private final Socket socket;
 	private final boolean showLog;
+	private final RequestProcessor requestProcessor;
 
 	RequestHandler(Socket socket, boolean showLog)
 	{
 		this.socket = socket;
 		this.showLog = showLog;
+		this.requestProcessor = new RequestProcessor();
 	}
 
 	void handle()
@@ -36,38 +38,41 @@ public class RequestHandler
 				String date = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss:SSS:z").format(new Date());
 				System.out.println("[" + date + "] " + socket.getInetAddress().getHostAddress() + " " + requestMethod + " " + request.getUrl());
 			}
+			PartialResponse partialResponse;
 			switch (requestMethod)
 			{
 				case "GET":
-					sendResponse(outputStream, handleGetRequest(request));
+					partialResponse = requestProcessor.get(request.getUrl(), request.getHeaders());
 					break;
 				case "HEAD":
-					sendResponse(outputStream, handleHeadRequest(request));
+					partialResponse = requestProcessor.head(request.getUrl(), request.getHeaders());
 					break;
 				case "POST":
-					sendResponse(outputStream, handlePostRequest(request));
+					partialResponse = requestProcessor.post(request.getUrl(), request.getHeaders());
 					break;
 				case "PUT":
-					sendResponse(outputStream, handlePutRequest(request));
+					partialResponse = requestProcessor.put(request.getUrl(), request.getHeaders());
 					break;
 				case "DELETE":
-					sendResponse(outputStream, handleDeleteRequest(request));
+					partialResponse = requestProcessor.delete(request.getUrl(), request.getHeaders());
 					break;
 				case "CONNECT":
-					sendResponse(outputStream, handleConnectRequest(request));
+					partialResponse = requestProcessor.connect(request.getUrl(), request.getHeaders());
 					break;
 				case "OPTIONS":
-					sendResponse(outputStream, handleOptionsRequest(request));
+					partialResponse = requestProcessor.options(request.getUrl(), request.getHeaders());
 					break;
 				case "TRACE":
-					sendResponse(outputStream, handleTraceRequest(request));
+					partialResponse = requestProcessor.trace(request.getUrl(), request.getHeaders());
 					break;
 				case "PATCH":
-					sendResponse(outputStream, handlePatchRequest(request));
+					partialResponse = requestProcessor.patch(request.getUrl(), request.getHeaders());
 					break;
 				default:
-					sendResponse(outputStream, generateResponse(405, null, null));
+					partialResponse = requestProcessor.none(request.getUrl(), request.getHeaders());
 			}
+			Response response = generateResponse(partialResponse);
+			sendResponse(outputStream, response);
 		}
 		catch (Exception e)
 		{
@@ -79,73 +84,9 @@ public class RequestHandler
 		}
 	}
 
-	/* This method handles all the GET requests */
-	private Response handleGetRequest(Request request)
-	{
-		switch (request.getUrl())
-		{
-			case "/":
-			{
-				byte[] body = "hello user".getBytes(StandardCharsets.UTF_8);
-				return generateResponse(200, null, body);
-			}
-			default:
-			{
-				return generateResponse(404, null, null);
-			}
-		}
-	}
-
-	/* This method handles all the HEAD requests */
-	private Response handleHeadRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the POST requests */
-	private Response handlePostRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the PUT requests */
-	private Response handlePutRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the DELETE requests */
-	private Response handleDeleteRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the CONNECT requests */
-	private Response handleConnectRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the OPTIONS requests */
-	private Response handleOptionsRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the TRACE requests */
-	private Response handleTraceRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
-	/* This method handles all the PATCH requests */
-	private Response handlePatchRequest(Request request)
-	{
-		return generateResponse(500, null, null);
-	}
-
 	private Request getRequest(InputStream inputStream)throws IOException
 	{
+		int totalBytesRead = 0;
 		String method = "";
 		String url = "";
 		String version = "";
@@ -228,10 +169,15 @@ public class RequestHandler
 		return new Request(method, url, version, parametersMap, headersMap, body);
 	}
 
-	private Response generateResponse(int responseCode, Map<String, String> extraHeaders, byte[] body)
+	private Response generateResponse(PartialResponse response)
 	{
 		String version = "HTTP/1.1";
+		int responseCode = response.getResponseCode();
 		String responseCodeText;
+		Map<String, String> headersMap = new HashMap<>();
+		Map<String, String> customHeaders = response.getCustomHeaders();
+		byte[] body = response.getBody();
+
 		switch (responseCode)
 		{
 			case 200:
@@ -250,21 +196,22 @@ public class RequestHandler
 				responseCodeText = "Internal Server Error";
 				break;
 			default:
-				responseCodeText = "Bad Request";
+				responseCodeText = "Unknown code";
 		}
-		Map<String, String> headerMap = new HashMap<>();
-		headerMap.put("Date", (new Date()).toString());
-		if(extraHeaders!=null && extraHeaders.size()!=0)
+
+		headersMap.put("Date", (new Date()).toString());
+		headersMap.put("Server", "Nebula");
+		headersMap.put("Connection", "close");
+		if(customHeaders!=null)
 		{
-			headerMap.putAll(extraHeaders);
+			headersMap.putAll(customHeaders);
 		}
 		if(body!=null)
 		{
-			headerMap.put("Content-Length", String.valueOf(body.length));
+			headersMap.put("Content-Length", String.valueOf(body.length));
 		}
-		headerMap.put("Server", "Nebula");
-		headerMap.put("Connection", "close");
-		return new Response(version, responseCode, responseCodeText, headerMap, body);
+
+		return new Response(version, responseCode, responseCodeText, headersMap, body);
 	}
 
 	private void sendResponse(OutputStream outputStream, Response response) throws IOException
