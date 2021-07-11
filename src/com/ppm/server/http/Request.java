@@ -21,9 +21,30 @@ class Request
 		this.method = method;
 		this.url = url;
 		this.version = version;
-		this.parameters = parameters;
-		this.headers = headers;
-		this.body = body;
+		if(parameters != null && parameters.size() == 0)
+		{
+			this.parameters = null;
+		}
+		else
+		{
+			this.parameters = parameters;
+		}
+		if(headers != null && headers.size() == 0)
+		{
+			this.headers = null;
+		}
+		else
+		{
+			this.headers = headers;
+		}
+		if(body != null && body.length == 0)
+		{
+			this.body = null;
+		}
+		else
+		{
+			this.body = body;
+		}
 	}
 
 	String getMethod()
