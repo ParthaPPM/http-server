@@ -18,6 +18,11 @@ class PartialResponse
 		this(200, null, body);
 	}
 
+	PartialResponse(Map<String, String> customHeaders, byte[] body)
+	{
+		this(200, customHeaders, body);
+	}
+
 	PartialResponse(int responseCode, Map<String, String> customHeaders)
 	{
 		this(responseCode, customHeaders, null);

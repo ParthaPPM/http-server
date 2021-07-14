@@ -182,6 +182,9 @@ public class RequestHandler
 			case 200:
 				responseCodeText = "OK";
 				break;
+			case 400:
+				responseCodeText = "Bad Request";
+				break;
 			case 403:
 				responseCodeText = "Forbidden";
 				break;
