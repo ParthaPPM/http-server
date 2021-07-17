@@ -42,34 +42,34 @@ public class RequestHandler
 			switch (requestMethod)
 			{
 				case "GET":
-					partialResponse = requestProcessor.get(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.get(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "HEAD":
-					partialResponse = requestProcessor.head(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.head(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "POST":
-					partialResponse = requestProcessor.post(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.post(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "PUT":
-					partialResponse = requestProcessor.put(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.put(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "DELETE":
-					partialResponse = requestProcessor.delete(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.delete(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "CONNECT":
-					partialResponse = requestProcessor.connect(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.connect(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "OPTIONS":
-					partialResponse = requestProcessor.options(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.options(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "TRACE":
-					partialResponse = requestProcessor.trace(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.trace(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				case "PATCH":
-					partialResponse = requestProcessor.patch(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.patch(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 					break;
 				default:
-					partialResponse = requestProcessor.none(request.getUrl(), request.getParameters(), request.getHeaders());
+					partialResponse = requestProcessor.none(request.getUrl(), request.getParameters(), request.getHeaders(), request.getBody());
 			}
 			Response response = generateResponse(partialResponse);
 			sendResponse(outputStream, response);
