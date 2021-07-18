@@ -179,11 +179,83 @@ public class RequestHandler
 
 		switch (responseCode)
 		{
+			case 100:
+				responseCodeText = "Continue";
+				break;
+			case 101:
+				responseCodeText = "Switching Protocol";
+				break;
+			case 102:
+				responseCodeText = "Processing";
+				break;
+			case 103:
+				responseCodeText = "Early Hints";
+				break;
 			case 200:
 				responseCodeText = "OK";
 				break;
+			case 201:
+				responseCodeText = "Created";
+				break;
+			case 202:
+				responseCodeText = "Accepted";
+				break;
+			case 203:
+				responseCodeText = "Non-Authoritative Information";
+				break;
+			case 204:
+				responseCodeText = "No Content";
+				break;
+			case 205:
+				responseCodeText = "Reset Content";
+				break;
+			case 206:
+				responseCodeText = "Partial Content";
+				break;
+			case 207:
+				responseCodeText = "Multi-Status";
+				break;
+			case 208:
+				responseCodeText = "Already Reported";
+				break;
+			case 226:
+				responseCodeText = "IM Used";
+				break;
+			case 300:
+				responseCodeText = "Multiple Choice";
+				break;
+			case 301:
+				responseCodeText = "Moved Permanently";
+				break;
+			case 302:
+				responseCodeText = "Found";
+				break;
+			case 303:
+				responseCodeText = "See Other";
+				break;
+			case 304:
+				responseCodeText = "Not Modified";
+				break;
+			case 305:
+				responseCodeText = "Use Proxy";
+				break;
+			case 306:
+				responseCodeText = "unused";
+				break;
+			case 307:
+				responseCodeText = "Temporary Redirect";
+				break;
+			case 308:
+				responseCodeText = "Permanent Redirect";
+				break;
 			case 400:
 				responseCodeText = "Bad Request";
+				break;
+			case 401:
+				responseCodeText = "Unauthorized";
+				break;
+			case 402:
+				responseCodeText = "Payment Required";
 				break;
 			case 403:
 				responseCodeText = "Forbidden";
@@ -194,8 +266,107 @@ public class RequestHandler
 			case 405:
 				responseCodeText = "Method Not Allowed";
 				break;
+			case 406:
+				responseCodeText = "Not Acceptable";
+				break;
+			case 407:
+				responseCodeText = "Proxy Authentication Required";
+				break;
+			case 408:
+				responseCodeText = "Request Timeout";
+				break;
+			case 409:
+				responseCodeText = "Conflict";
+				break;
+			case 410:
+				responseCodeText = "Gone";
+				break;
+			case 411:
+				responseCodeText = "Length Required";
+				break;
+			case 412:
+				responseCodeText = "Precondition Failed";
+				break;
+			case 413:
+				responseCodeText = "Payload Too Large";
+				break;
+			case 414:
+				responseCodeText = "URI Too Long";
+				break;
+			case 415:
+				responseCodeText = "Unsupported Media Type";
+				break;
+			case 416:
+				responseCodeText = "Range Not Satisfiable";
+				break;
+			case 417:
+				responseCodeText = "Expectation Failed";
+				break;
+			case 418:
+				responseCodeText = "I'm a teapot";
+				break;
+			case 421:
+				responseCodeText = "Misdirected Request";
+				break;
+			case 422:
+				responseCodeText = "Unprocessable Entity";
+				break;
+			case 423:
+				responseCodeText = "Locked";
+				break;
+			case 424:
+				responseCodeText = "Failed Dependency";
+				break;
+			case 425:
+				responseCodeText = "Too Early";
+				break;
+			case 426:
+				responseCodeText = "Upgrade Required";
+				break;
+			case 428:
+				responseCodeText = "Precondition Required";
+				break;
+			case 429:
+				responseCodeText = "Too Many Requests";
+				break;
+			case 431:
+				responseCodeText = "Request Header Fields Too Large";
+				break;
+			case 451:
+				responseCodeText = "Unavailable For Legal Reasons";
+				break;
 			case 500:
 				responseCodeText = "Internal Server Error";
+				break;
+			case 501:
+				responseCodeText = "Not Implemented";
+				break;
+			case 502:
+				responseCodeText = "Bad Gateway";
+				break;
+			case 503:
+				responseCodeText = "Service Unavailable";
+				break;
+			case 504:
+				responseCodeText = "Gateway Timeout";
+				break;
+			case 505:
+				responseCodeText = "HTTP Version Not Supported";
+				break;
+			case 506:
+				responseCodeText = "Variant Also Negotiates";
+				break;
+			case 507:
+				responseCodeText = "Insufficient Storage";
+				break;
+			case 508:
+				responseCodeText = "Loop Detected";
+				break;
+			case 510:
+				responseCodeText = "Not Extended";
+				break;
+			case 511:
+				responseCodeText = "Network Authentication Required";
 				break;
 			default:
 				responseCodeText = "Unknown code";
