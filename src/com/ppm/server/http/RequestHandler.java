@@ -16,12 +16,14 @@ import java.util.Scanner;
 public class RequestHandler
 {
 	private final Socket socket;
+	private boolean closeConnection;
 	private final boolean showLog;
 	private final RequestProcessor requestProcessor;
 
 	RequestHandler(Socket socket, boolean showLog)
 	{
 		this.socket = socket;
+		this.closeConnection = false;
 		this.showLog = showLog;
 		this.requestProcessor = new RequestProcessor();
 	}
@@ -78,10 +80,6 @@ public class RequestHandler
 		{
 			e.printStackTrace();
 		}
-		finally
-		{
-			stop();
-		}
 	}
 
 	private Request getRequest(InputStream inputStream)throws IOException
@@ -96,7 +94,7 @@ public class RequestHandler
 		StringBuilder line = new StringBuilder();
 		boolean isFirstLine = true;
 
-		//reading the request
+		//reading the request character by character
 		while(true)
 		{
 			int b = inputStream.read();
@@ -152,6 +150,13 @@ public class RequestHandler
 						if (key.equals("Content-Length"))
 						{
 							bytesToRead = Integer.parseInt(value);
+						}
+						else if(key.equals("Connection"))
+						{
+							if(value.equals("close"))
+							{
+								this.closeConnection = true;
+							}
 						}
 					}
 					line = new StringBuilder();
@@ -374,7 +379,7 @@ public class RequestHandler
 
 		headersMap.put("Date", (new Date()).toString());
 		headersMap.put("Server", "Nebula");
-		headersMap.put("Connection", "close");
+		headersMap.put("Connection", "keep-alive");
 		if(customHeaders!=null)
 		{
 			headersMap.putAll(customHeaders);
@@ -401,9 +406,12 @@ public class RequestHandler
 		{
 			outputStream.write(response.getBody());
 		}
-		outputStream.flush();
-		outputStream.close();
-		socket.close();
+		outputStream.write(-1);
+
+		if(this.closeConnection)
+		{
+			stop();
+		}
 	}
 
 	void stop()
