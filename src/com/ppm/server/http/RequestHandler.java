@@ -384,7 +384,11 @@ public class RequestHandler
 		{
 			headersMap.putAll(customHeaders);
 		}
-		if(body!=null)
+		if(body==null)
+		{
+			headersMap.put("Content-Length", "0");
+		}
+		else
 		{
 			headersMap.put("Content-Length", String.valueOf(body.length));
 		}
@@ -406,11 +410,14 @@ public class RequestHandler
 		{
 			outputStream.write(response.getBody());
 		}
-		outputStream.write(-1);
 
 		if(this.closeConnection)
 		{
 			stop();
+		}
+		else
+		{
+			handle();
 		}
 	}
 
