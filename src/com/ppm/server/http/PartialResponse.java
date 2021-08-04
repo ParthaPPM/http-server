@@ -2,38 +2,38 @@ package com.ppm.server.http;
 
 import java.util.Map;
 
-class PartialResponse
+public class PartialResponse
 {
 	private final int responseCode;
 	private final Map<String, String> customHeaders;
 	private final byte[] body;
 
-	PartialResponse()
+	public PartialResponse()
 	{
 		this(404, null, null);
 	}
 
-	PartialResponse(byte[] body)
+	public PartialResponse(byte[] body)
 	{
 		this(200, null, body);
 	}
 
-	PartialResponse(Map<String, String> customHeaders, byte[] body)
+	public PartialResponse(Map<String, String> customHeaders, byte[] body)
 	{
 		this(200, customHeaders, body);
 	}
 
-	PartialResponse(int responseCode, Map<String, String> customHeaders)
+	public PartialResponse(int responseCode, Map<String, String> customHeaders)
 	{
 		this(responseCode, customHeaders, null);
 	}
 
-	PartialResponse(int responseCode, byte[] body)
+	public PartialResponse(int responseCode, byte[] body)
 	{
 		this(responseCode, null, body);
 	}
 
-	PartialResponse(int responseCode, Map<String, String> customHeaders, byte[] body)
+	public PartialResponse(int responseCode, Map<String, String> customHeaders, byte[] body)
 	{
 		this.responseCode = responseCode;
 		if (customHeaders != null && customHeaders.size() == 0)
@@ -54,17 +54,17 @@ class PartialResponse
 		}
 	}
 
-	int getResponseCode()
+	public int getResponseCode()
 	{
 		return responseCode;
 	}
 
-	Map<String, String> getCustomHeaders()
+	public Map<String, String> getCustomHeaders()
 	{
 		return customHeaders;
 	}
 
-	byte[] getBody()
+	public byte[] getBody()
 	{
 		return body;
 	}

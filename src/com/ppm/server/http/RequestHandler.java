@@ -32,6 +32,7 @@ public class RequestHandler
 	{
 		try
 		{
+			socket.setSoTimeout(60000);
 			OutputStream outputStream = socket.getOutputStream();
 			Request request = getRequest(socket.getInputStream());
 			String requestMethod = request.getMethod();
@@ -78,6 +79,7 @@ public class RequestHandler
 		}
 		catch (Exception e)
 		{
+			stop();
 			e.printStackTrace();
 		}
 	}
@@ -144,8 +146,8 @@ public class RequestHandler
 					{
 						String l = line.toString();
 						int colonIndexPos = l.indexOf(':');
-						String key = l.substring(0,colonIndexPos).trim();
-						String value = l.substring(colonIndexPos+1).trim();
+						String key = l.substring(0, colonIndexPos).trim();
+						String value = l.substring(colonIndexPos + 1).trim();
 						headersMap.put(key, value);
 						if (key.equals("Content-Length"))
 						{
@@ -165,7 +167,7 @@ public class RequestHandler
 		}
 
 		//reading the body
-		if(bytesToRead>0)
+		if(bytesToRead > 0)
 		{
 			body = new byte[bytesToRead];
 			inputStream.read(body, 0, bytesToRead);
@@ -430,7 +432,7 @@ public class RequestHandler
 				socket.close();
 			}
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
