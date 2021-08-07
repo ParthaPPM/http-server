@@ -9,6 +9,7 @@ public class HttpServer
 	private final boolean showLog;
 	private boolean isServerRunning;
 	private ServerSocket serverSocket;
+	private RequestProcessor requestProcessor;
 
 	public HttpServer()
 	{
@@ -30,6 +31,12 @@ public class HttpServer
 		this.port = port;
 		this.showLog = showLog;
 		isServerRunning = false;
+		requestProcessor = new RequestProcessor();
+	}
+
+	public void setRequestProcessor(RequestProcessor requestProcessor)
+	{
+		this.requestProcessor = requestProcessor;
 	}
 
 	public void start()
@@ -42,7 +49,7 @@ public class HttpServer
 			while (isServerRunning)
 			{
 				Socket socket = serverSocket.accept();
-				RequestHandler requestHandler = new RequestHandler(socket, showLog);
+				RequestHandler requestHandler = new RequestHandler(socket, requestProcessor, showLog);
 				Thread t = new Thread(requestHandler::handle);
 				t.start();
 			}

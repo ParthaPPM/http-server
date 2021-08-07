@@ -4,6 +4,9 @@ import java.util.Map;
 
 public class RequestProcessor
 {
+	public RequestProcessor()
+	{}
+
 	/* This method handles all the GET requests */
 	public PartialResponse get(String url, Map<String, String> requestParameters, Map<String, String> requestHeaders, byte[] requestBody)
 	{

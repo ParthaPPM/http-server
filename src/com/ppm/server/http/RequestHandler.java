@@ -20,12 +20,12 @@ public class RequestHandler
 	private final boolean showLog;
 	private final RequestProcessor requestProcessor;
 
-	RequestHandler(Socket socket, boolean showLog)
+	RequestHandler(Socket socket, RequestProcessor requestProcessor, boolean showLog)
 	{
 		this.socket = socket;
 		this.closeConnection = false;
 		this.showLog = showLog;
-		this.requestProcessor = new RequestProcessor();
+		this.requestProcessor = requestProcessor;
 	}
 
 	void handle()
