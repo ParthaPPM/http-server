@@ -1,4 +1,4 @@
-package com.ppm.server.http;
+package com.ppm.http.server;
 
 import java.util.Map;
 
