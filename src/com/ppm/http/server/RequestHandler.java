@@ -100,69 +100,66 @@ public class RequestHandler
 		while(true)
 		{
 			int b = inputStream.read();
-			if(b!=-1)
+			if(b!='\r')
 			{
-				if(b!='\r')
+				line.append((char)b);
+			}
+			else
+			{
+				inputStream.read();
+				String l = line.toString();
+				if (l.equals(""))
 				{
-					line.append((char)b);
+					break;
 				}
-				else
+				if(isFirstLine)
 				{
-					inputStream.read();
-					if (line.toString().equals(""))
-					{
-						break;
-					}
-					if(isFirstLine)
-					{
-						isFirstLine = false;
-						Scanner sc = new Scanner(line.toString());
-						method = sc.next();
-						String urlWithParameters = URLDecoder.decode(sc.next(), StandardCharsets.UTF_8.toString());
-						version = sc.next();
+					isFirstLine = false;
+					Scanner sc = new Scanner(l);
+					method = sc.next();
+					String urlWithParameters = URLDecoder.decode(sc.next(), StandardCharsets.UTF_8.toString());
+					version = sc.next();
 
-						int indexOfQuestionMark = urlWithParameters.indexOf('?');
-						if (indexOfQuestionMark == -1)
-						{
-							url = urlWithParameters;
-						}
-						else
-						{
-							url = urlWithParameters.substring(0, indexOfQuestionMark);
-							String parameters = urlWithParameters.substring(indexOfQuestionMark + 1);
-							sc = new Scanner(parameters);
-							sc.useDelimiter("&");
-							while (sc.hasNext())
-							{
-								String s = sc.next();
-								int indexOfEquals = s.indexOf('=');
-								String key = s.substring(0, indexOfEquals).trim();
-								String value = s.substring(indexOfEquals + 1).trim();
-								parametersMap.put(key, value);
-							}
-						}
+					int indexOfQuestionMark = urlWithParameters.indexOf('?');
+					if (indexOfQuestionMark == -1)
+					{
+						url = urlWithParameters;
 					}
 					else
 					{
-						String l = line.toString();
-						int colonIndexPos = l.indexOf(':');
-						String key = l.substring(0, colonIndexPos).trim();
-						String value = l.substring(colonIndexPos + 1).trim();
-						headersMap.put(key, value);
-						if (key.equals("Content-Length"))
+						url = urlWithParameters.substring(0, indexOfQuestionMark);
+						String parameters = urlWithParameters.substring(indexOfQuestionMark + 1);
+						sc = new Scanner(parameters);
+						sc.useDelimiter("&");
+						while (sc.hasNext())
 						{
-							bytesToRead = Integer.parseInt(value);
-						}
-						else if(key.equals("Connection"))
-						{
-							if(value.equals("close"))
-							{
-								this.closeConnection = true;
-							}
+							String s = sc.next();
+							int indexOfEquals = s.indexOf('=');
+							String key = s.substring(0, indexOfEquals).trim();
+							String value = s.substring(indexOfEquals + 1).trim();
+							parametersMap.put(key, value);
 						}
 					}
-					line = new StringBuilder();
 				}
+				else
+				{
+					int colonIndexPos = l.indexOf(':');
+					String key = l.substring(0, colonIndexPos).trim();
+					String value = l.substring(colonIndexPos + 1).trim();
+					headersMap.put(key, value);
+					if (key.equals("Content-Length"))
+					{
+						bytesToRead = Integer.parseInt(value);
+					}
+					else if(key.equals("Connection"))
+					{
+						if(value.equals("close"))
+						{
+							this.closeConnection = true;
+						}
+					}
+				}
+				line = new StringBuilder();
 			}
 		}
 

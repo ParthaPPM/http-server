@@ -44,17 +44,4 @@ class Response
 	{
 		return body;
 	}
-
-	public String toString()
-	{
-		String lineSeparator = System.lineSeparator();
-		StringBuilder sb = new StringBuilder();
-		Set<String> keySet = headers.keySet();
-		sb.append(version).append(" ").append(responseCode).append(" ").append(responseCodeText).append(lineSeparator);
-		for (String key : keySet)
-		{
-			sb.append(key).append(": ").append(headers.get(key)).append(lineSeparator);
-		}
-		return sb.toString();
-	}
 }

@@ -76,37 +76,4 @@ class Request
 	{
 		return body;
 	}
-
-	public String toString()
-	{
-		String lineSeparator = System.lineSeparator();
-		StringJoiner sj = new StringJoiner("&");
-		Set<String> keySet = parameters.keySet();
-		for (String key : keySet)
-		{
-			sj.add(key + "=" + parameters.get(key));
-		}
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(method).append(" ").append(url);
-		if (parameters.size()!=0)
-		{
-			sb.append("?");
-			try
-			{
-				sb.append(URLDecoder.decode(sj.toString(), StandardCharsets.UTF_8.toString()));
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		sb.append(" ").append(version).append(lineSeparator);
-		keySet = headers.keySet();
-		for (String key : keySet)
-		{
-			sb.append(key).append(": ").append(headers.get(key)).append(lineSeparator);
-		}
-		return sb.toString();
-	}
 }
