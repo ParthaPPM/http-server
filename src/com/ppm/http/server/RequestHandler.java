@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-public class RequestHandler
+class RequestHandler
 {
 	private final Socket socket;
 	private boolean closeConnection;

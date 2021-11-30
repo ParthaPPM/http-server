@@ -3,7 +3,7 @@ package com.ppm.http.server;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class HttpServer
+public class HttpServer implements Server
 {
 	private final int port;
 	private final boolean showLog;
