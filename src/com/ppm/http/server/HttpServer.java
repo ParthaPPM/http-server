@@ -1,42 +1,45 @@
 package com.ppm.http.server;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class HttpServer implements Server
 {
 	private final int port;
-	private final boolean showLog;
+	private final String host;
 	private boolean isServerRunning;
 	private ServerSocket serverSocket;
 	private RequestProcessor requestProcessor;
+	private int timeoutInMilliSeconds;
 
 	public HttpServer()
 	{
-		this(80, true);
+		this(80);
 	}
 
 	public HttpServer(int port)
 	{
-		this(port, true);
+		this(port, null);
 	}
 
-	public HttpServer(boolean showLog)
-	{
-		this(80, showLog);
-	}
-
-	public HttpServer(int port, boolean showLog)
+	public HttpServer(int port, String host)
 	{
 		this.port = port;
-		this.showLog = showLog;
-		isServerRunning = false;
-		requestProcessor = new RequestProcessor();
+		this.host = host;
+		this.isServerRunning = false;
+		this.requestProcessor = new RequestProcessor();
+		this.timeoutInMilliSeconds = 60000;
 	}
 
 	public void setRequestProcessor(RequestProcessor requestProcessor)
 	{
 		this.requestProcessor = requestProcessor;
+	}
+
+	public void setTimeout(int milliSeconds)
+	{
+		this.timeoutInMilliSeconds = milliSeconds;
 	}
 
 	public void start()
@@ -45,11 +48,18 @@ public class HttpServer implements Server
 		isServerRunning = true;
 		try
 		{
-			serverSocket = new ServerSocket(port);
+			if (host == null)
+			{
+				serverSocket = new ServerSocket(port);
+			}
+			else
+			{
+				serverSocket = new ServerSocket(port, 0, InetAddress.getByName(host));
+			}
 			while (isServerRunning)
 			{
 				Socket socket = serverSocket.accept();
-				RequestHandler requestHandler = new RequestHandler(socket, requestProcessor, showLog);
+				RequestHandler requestHandler = new RequestHandler(socket, requestProcessor, timeoutInMilliSeconds);
 				Thread t = new Thread(requestHandler::handle);
 				t.start();
 			}

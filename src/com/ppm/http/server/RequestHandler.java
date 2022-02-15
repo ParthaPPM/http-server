@@ -17,30 +17,29 @@ class RequestHandler
 {
 	private final Socket socket;
 	private boolean closeConnection;
-	private final boolean showLog;
 	private final RequestProcessor requestProcessor;
+	private final int timeoutInMilliSeconds;
 
-	RequestHandler(Socket socket, RequestProcessor requestProcessor, boolean showLog)
+	RequestHandler(Socket socket, RequestProcessor requestProcessor, int timeoutInMilliSeconds)
 	{
 		this.socket = socket;
 		this.closeConnection = false;
-		this.showLog = showLog;
 		this.requestProcessor = requestProcessor;
+		this.timeoutInMilliSeconds = timeoutInMilliSeconds;
 	}
 
 	void handle()
 	{
 		try
 		{
-			socket.setSoTimeout(60000);
+			socket.setSoTimeout(timeoutInMilliSeconds);
 			OutputStream outputStream = socket.getOutputStream();
 			Request request = getRequest(socket.getInputStream());
 			String requestMethod = request.getMethod();
-			if(showLog)
-			{
-				String date = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss:SSS:z").format(new Date());
-				System.out.println("[" + date + "] " + socket.getInetAddress().getHostAddress() + " " + requestMethod + " " + request.getUrl());
-			}
+			// Logging starts, should be removed while implementing the logging logic
+			String date = new SimpleDateFormat("yyyy:MM:dd:HH:mm:ss:SSS:z").format(new Date());
+			System.out.println("[" + date + "] " + socket.getInetAddress().getHostAddress() + " " + requestMethod + " " + request.getUrl());
+			// Logging ends, should be removed while implementing the logging logic
 			PartialResponse partialResponse;
 			switch (requestMethod)
 			{
