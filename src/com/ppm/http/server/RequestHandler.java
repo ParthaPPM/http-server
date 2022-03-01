@@ -79,7 +79,6 @@ class RequestHandler
 		catch (Exception e)
 		{
 			stop();
-			e.printStackTrace();
 		}
 	}
 
@@ -428,9 +427,6 @@ class RequestHandler
 				socket.close();
 			}
 		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		catch (Exception ignored) {}
 	}
 }

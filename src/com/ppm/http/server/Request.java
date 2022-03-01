@@ -1,11 +1,6 @@
 package com.ppm.http.server;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
 
 class Request
 {
@@ -21,22 +16,8 @@ class Request
 		this.method = method;
 		this.url = url;
 		this.version = version;
-		if(parameters != null && parameters.size() == 0)
-		{
-			this.parameters = null;
-		}
-		else
-		{
-			this.parameters = parameters;
-		}
-		if(headers != null && headers.size() == 0)
-		{
-			this.headers = null;
-		}
-		else
-		{
-			this.headers = headers;
-		}
+		this.parameters = parameters;
+		this.headers = headers;
 		if(body != null && body.length == 0)
 		{
 			this.body = null;
