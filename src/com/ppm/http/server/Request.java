@@ -13,47 +13,41 @@ class Request
 
 	Request(String method, String url, String version, Map<String, String> parameters, Map<String, String> headers, byte[] body)
 	{
-		this.method = method;
-		this.url = url;
+		this.method = method.toUpperCase();
+		String s = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+		this.url = s.startsWith("/") ? s : ("/" + s);
 		this.version = version;
 		this.parameters = parameters;
 		this.headers = headers;
-		if(body != null && body.length == 0)
-		{
-			this.body = null;
-		}
-		else
-		{
-			this.body = body;
-		}
+		this.body = body;
 	}
 
-	String getMethod()
+	String method()
 	{
 		return method;
 	}
 
-	String getUrl()
+	String url()
 	{
 		return url;
 	}
 
-	String getVersion()
+	String version()
 	{
 		return version;
 	}
 
-	Map<String, String> getParameters()
+	Map<String, String> parameters()
 	{
 		return parameters;
 	}
 
-	Map<String, String> getHeaders()
+	Map<String, String> headers()
 	{
 		return headers;
 	}
 
-	byte[] getBody()
+	byte[] body()
 	{
 		return body;
 	}
