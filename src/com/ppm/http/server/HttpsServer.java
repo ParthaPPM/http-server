@@ -2,7 +2,6 @@ package com.ppm.http.server;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
-import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,38 +28,9 @@ public class HttpsServer implements Server
 	public HttpsServer(int port, String host)
 	{
 		// these steps are for ssl certificate
-		String keyStoreFileName = "";
-		String keyStorePassword = "";
-		try
-		{
-			String currentDirectory = System.getProperty("user.dir");
-			File file = new File(currentDirectory + "\\server.config");
-			if (file.isFile())
-			{
-				String line;
-				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-				while((line = br.readLine()) != null)
-				{
-					int equalsIndex = line.indexOf('=');
-					String key = line.substring(0, equalsIndex);
-					String value = line.substring(equalsIndex+1);
-					if (key.equals("keyStoreFileName"))
-					{
-						keyStoreFileName = value;
-					}
-					if (key.equals("password"))
-					{
-						keyStorePassword = value;
-					}
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		System.setProperty("javax.net.ssl.keyStore", keyStoreFileName);
-		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+		ConfigurationProperties properties = ConfigurationProperties.getInstance();
+		System.setProperty("javax.net.ssl.keyStore", properties.keyStoreFileName());
+		System.setProperty("javax.net.ssl.keyStorePassword", properties.keyStorePassword());
 
 		this.port = port;
 		this.host = host;

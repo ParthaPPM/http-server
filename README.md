@@ -24,12 +24,18 @@ class TestRequestProcessor extends RequestProcessor
 ```
 **Main function for starting the server**
 ```java
-TestRequestProcessor testRequestProcessor = new TestRequestProcessor();
+public class Main
+{
+	public static void main(String[] args)
+	{
+		TestRequestProcessor testRequestProcessor = new TestRequestProcessor();
 
-Server server = new HttpServer(); // Starts an HTTP Server
-Server server = new HttpsServer(); // Starts an HTTPS Server
-server.setRequestProcessor(testRequestProcessor);
-server.start();
+		Server server = new HttpServer(); // Starts an HTTP Server
+		Server server = new HttpsServer(); // Starts an HTTPS Server
+		server.setRequestProcessor(testRequestProcessor);
+		server.start();
+	}
+}
 ```
 
 ## Documentation:-

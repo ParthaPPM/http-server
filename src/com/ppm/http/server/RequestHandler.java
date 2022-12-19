@@ -93,7 +93,7 @@ class RequestHandler
 					isFirstLine = false;
 					Scanner sc = new Scanner(l);
 					method = sc.next();
-					String urlWithParameters = URLDecoder.decode(sc.next(), StandardCharsets.UTF_8.toString());
+					String urlWithParameters = URLDecoder.decode(sc.next(), StandardCharsets.UTF_8);
 					version = sc.next();
 
 					int indexOfQuestionMark = urlWithParameters.indexOf('?');

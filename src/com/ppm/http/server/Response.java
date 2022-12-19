@@ -38,7 +38,7 @@ public class Response
 		this.headers = new HashMap<>();
 		this.headers.putAll((headers==null) ? new HashMap<>() : headers);
 		this.headers.put("Date", (new Date()).toString());
-		this.headers.put("Server", "Nebula");
+		this.headers.put("Server", ConfigurationProperties.getInstance().serverName());
 		this.headers.put("Connection", "keep-alive");
 		this.headers.put("Content-Length", (body==null) ? "0" : String.valueOf(body.length));
 		this.body = (body == null) ? new byte[]{} : body;
