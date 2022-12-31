@@ -1,5 +1,5 @@
 # Project exclude paths
-/.idea/
-/META-INF/
+*.iml
+.idea/
+/META-INF
 /out/
-/Slow-HTTP-Server.iml
