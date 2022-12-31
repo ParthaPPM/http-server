@@ -1,4 +1,4 @@
-package com.ppm.http.server;
+package io.github.parthappm.http.server;
 
 import java.io.File;
 import java.io.FileInputStream;

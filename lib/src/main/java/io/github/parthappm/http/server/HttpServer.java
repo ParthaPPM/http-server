@@ -1,4 +1,4 @@
-package com.ppm.http.server;
+package io.github.parthappm.http.server;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;

@@ -1,4 +1,4 @@
-package com.ppm.http.server;
+package io.github.parthappm.http.server;
 
 public interface Server
 {
