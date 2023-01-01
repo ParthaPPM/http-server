@@ -1,62 +1,79 @@
 package io.github.parthappm.http.server;
 
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Response
 {
-	private final String version;
-	private final int responseCode;
+	private int statusCode;
 	private final Map<String, String> headers;
-	private final byte[] body;
+	private byte[] body;
 
 	public Response()
 	{
-		this(404, null, null);
+		this(404);
+	}
+
+	public Response(int statusCode)
+	{
+		this.statusCode = statusCode;
+		this.headers = new HashMap<>();
+		this.body = new byte[0];
+	}
+
+	public Response(String body)
+	{
+		this(body.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public Response(byte[] body)
 	{
-		this(200, null, body);
-	}
-
-	public Response(int responseCode, byte[] body)
-	{
-		this(responseCode, null, body);
-	}
-
-	public Response(Map<String, String> headers, byte[] body)
-	{
-		this(200, headers, body);
-	}
-
-	public Response(int responseCode, Map<String, String> headers, byte[] body)
-	{
-		this.version = "HTTP/1.1";
-		this.responseCode = responseCode;
+		this.statusCode = 200;
 		this.headers = new HashMap<>();
-		this.headers.putAll((headers==null) ? new HashMap<>() : headers);
-		this.headers.put("Date", (new Date()).toString());
-		this.headers.put("Server", ConfigurationProperties.getInstance().serverName());
-		this.headers.put("Connection", "keep-alive");
-		this.headers.put("Content-Length", (body==null) ? "0" : String.valueOf(body.length));
-		this.body = (body == null) ? new byte[]{} : body;
+		this.body = (body == null) ? new byte[0] : body;
 	}
 
-	String version()
+	public Response setStatusCode(int statusCode)
 	{
-		return version;
+		this.statusCode = statusCode;
+		return this;
 	}
 
-	int responseCode()
+	public Response setHeader(Map<String, String> headers)
 	{
-		return responseCode;
+		if (headers != null)
+		{
+			this.headers.putAll(headers);
+		}
+		return this;
 	}
 
-	String responseCodeText()
+	public Response addHeader(String key, String value)
 	{
-		return switch (responseCode)
+		headers.put(key, value);
+		return this;
+	}
+
+	public Response setBody(String body)
+	{
+		return setBody(body.getBytes(StandardCharsets.UTF_8));
+	}
+
+	public Response setBody(byte[] body)
+	{
+		this.body = (body == null) ? new byte[0] : body;
+		return this;
+	}
+
+	int statusCode()
+	{
+		return statusCode;
+	}
+
+	String statusText()
+	{
+		return switch (statusCode)
 		{
 			case 100 -> "Continue";
 			case 101 -> "Switching Protocol";

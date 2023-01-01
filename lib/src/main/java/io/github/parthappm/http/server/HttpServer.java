@@ -1,17 +1,13 @@
 package io.github.parthappm.http.server;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 
-public class HttpServer implements Server
+public class HttpServer extends Server
 {
 	private final int port;
 	private final String host;
-	private boolean isServerRunning;
-	private ServerSocket serverSocket;
-	private RequestProcessor requestProcessor;
-	private int timeoutInMilliSeconds;
 
 	public HttpServer()
 	{
@@ -27,69 +23,19 @@ public class HttpServer implements Server
 	{
 		this.port = port;
 		this.host = host;
-		this.isServerRunning = false;
-		this.requestProcessor = new RequestProcessor();
-		this.timeoutInMilliSeconds = 60000;
-	}
-
-	public void setRequestProcessor(RequestProcessor requestProcessor)
-	{
-		this.requestProcessor = requestProcessor;
-	}
-
-	public void setTimeout(int milliSeconds)
-	{
-		this.timeoutInMilliSeconds = milliSeconds;
 	}
 
 	public void start()
 	{
-		System.out.println("Server started at port "+port);
-		isServerRunning = true;
+		System.out.println("Starting server at port: " + port);
 		try
 		{
-			if (host == null)
-			{
-				serverSocket = new ServerSocket(port);
-			}
-			else
-			{
-				serverSocket = new ServerSocket(port, 0, InetAddress.getByName(host));
-			}
-			while (isServerRunning)
-			{
-				Socket socket = serverSocket.accept();
-				RequestHandler requestHandler = new RequestHandler(socket, requestProcessor, timeoutInMilliSeconds);
-				Thread t = new Thread(requestHandler::handle);
-				t.start();
-			}
-			serverSocket.close();
+			setServerSocket(new ServerSocket(port, 0, host == null ? null : InetAddress.getByName(host)));
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
-			e.printStackTrace();
-			stop();
+			throw new RuntimeException(e);
 		}
-	}
-
-	public void stop()
-	{
-		isServerRunning = false;
-		try
-		{
-			if (serverSocket!=null)
-			{
-				serverSocket.close();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public boolean isServerRunning()
-	{
-		return isServerRunning;
+		super.start();
 	}
 }

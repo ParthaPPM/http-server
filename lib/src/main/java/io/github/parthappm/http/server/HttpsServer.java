@@ -2,18 +2,15 @@ package io.github.parthappm.http.server;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 
-public class HttpsServer implements Server
+public class HttpsServer extends Server
 {
 	private final int port;
 	private final String host;
-	private boolean isServerRunning;
-	private ServerSocket serverSocket;
-	private RequestProcessor requestProcessor;
-	private int timeoutInMilliSeconds;
+	private String keyStoreFileName;
+	private String keyStorePassword;
 
 	public HttpsServer()
 	{
@@ -27,77 +24,31 @@ public class HttpsServer implements Server
 
 	public HttpsServer(int port, String host)
 	{
-		// these steps are for ssl certificate
-		ConfigurationProperties properties = ConfigurationProperties.getInstance();
-		System.setProperty("javax.net.ssl.keyStore", properties.keyStoreFileName());
-		System.setProperty("javax.net.ssl.keyStorePassword", properties.keyStorePassword());
-
 		this.port = port;
 		this.host = host;
-		isServerRunning = false;
-		requestProcessor = new RequestProcessor();
-		this.timeoutInMilliSeconds = 60000;
 	}
 
-	public void setRequestProcessor(RequestProcessor requestProcessor)
+	public HttpsServer setKeyStore(String fileName, String password)
 	{
-		this.requestProcessor = requestProcessor;
-	}
-
-	public void setTimeout(int milliSeconds)
-	{
-		this.timeoutInMilliSeconds = milliSeconds;
+		this.keyStoreFileName = fileName;
+		this.keyStorePassword = password;
+		return this;
 	}
 
 	public void start()
 	{
-		System.out.println("Server started at port "+port);
-		isServerRunning = true;
+		System.out.println("Starting server at port: " + port);
+		System.setProperty("javax.net.ssl.keyStore", keyStoreFileName);
+		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+		ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
 		try
 		{
-			ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
-			if (host == null)
-			{
-				serverSocket = socketFactory.createServerSocket(port);
-			}
-			else
-			{
-				serverSocket = socketFactory.createServerSocket(port, 0, InetAddress.getByName(host));
-			}
-			while (isServerRunning)
-			{
-				Socket socket = serverSocket.accept();
-				RequestHandler requestHandler = new RequestHandler(socket, requestProcessor, timeoutInMilliSeconds);
-				Thread t = new Thread(requestHandler::handle);
-				t.start();
-			}
-			serverSocket.close();
+			setServerSocket(socketFactory.createServerSocket(port, 0, host == null ? null : InetAddress.getByName(host)));
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
-			e.printStackTrace();
-			stop();
+			throw new RuntimeException(e);
 		}
-	}
-
-	public void stop()
-	{
-		isServerRunning = false;
-		try
-		{
-			if (serverSocket!=null)
-			{
-				serverSocket.close();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public boolean isServerRunning()
-	{
-		return isServerRunning;
+		super.start();
 	}
 }
