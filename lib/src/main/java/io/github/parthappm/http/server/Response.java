@@ -4,17 +4,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * An instance of this class is to be created and returned from the methods of the RequestProcessor class.
+ */
 public class Response
 {
 	private int statusCode;
 	private final Map<String, String> headers;
 	private byte[] body;
 
+	/**
+	 * Creates a Response object with 404 status code and empty body.
+	 */
 	public Response()
 	{
 		this(404);
 	}
 
+	/**
+	 * Creates a Response object with specified status code and empty body.
+	 * @param statusCode The HTTP status code.
+	 */
 	public Response(int statusCode)
 	{
 		this.statusCode = statusCode;
@@ -22,11 +32,19 @@ public class Response
 		this.body = new byte[0];
 	}
 
+	/**
+	 * Creates a Response object with 200 status code and the specified body.
+	 * @param body The HTTP response body as String.
+	 */
 	public Response(String body)
 	{
 		this(body.getBytes(StandardCharsets.UTF_8));
 	}
 
+	/**
+	 * Creates a Response object with 200 status code and the specified body.
+	 * @param body The HTTP response body as byte array.
+	 */
 	public Response(byte[] body)
 	{
 		this.statusCode = 200;
@@ -34,12 +52,34 @@ public class Response
 		this.body = (body == null) ? new byte[0] : body;
 	}
 
+	/**
+	 * Setter method to set the HTTP status code.
+	 * @param statusCode The HTTP status code.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Response setStatusCode(int statusCode)
 	{
 		this.statusCode = statusCode;
 		return this;
 	}
 
+	/**
+	 * Setter method to add or modify a single HTTP header.
+	 * @param key The header name.
+	 * @param value The header value.
+	 * @return The reference of the current object for chaining.
+	 */
+	public Response addHeader(String key, String value)
+	{
+		headers.put(key, value);
+		return this;
+	}
+
+	/**
+	 * Setter method to set or modify multiple HTTP headers.
+	 * @param headers The Map of new or extra headers that are to be added to the HTTP response.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Response setHeader(Map<String, String> headers)
 	{
 		if (headers != null)
@@ -49,17 +89,21 @@ public class Response
 		return this;
 	}
 
-	public Response addHeader(String key, String value)
-	{
-		headers.put(key, value);
-		return this;
-	}
-
+	/**
+	 * Setter method to set the HTTP response body.
+	 * @param body The HTTP response body in String.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Response setBody(String body)
 	{
 		return setBody(body.getBytes(StandardCharsets.UTF_8));
 	}
 
+	/**
+	 * Setter method to set the HTTP response body.
+	 * @param body The HTTP response body in byte array.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Response setBody(byte[] body)
 	{
 		this.body = (body == null) ? new byte[0] : body;

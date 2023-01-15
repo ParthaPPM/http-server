@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -13,6 +14,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A server class to implement the HTTP server functionality.
+ * The object of this class cannot be created directly, either create an object of HttpServer or HttpsServer class.
+ */
 public class Server
 {
 	private final String NAME;
@@ -34,18 +39,34 @@ public class Server
 		this.serverSocket = serverSocket;
 	}
 
+	/**
+	 * Setter method to set the RequestProcessor for the server.
+	 * @param requestProcessor The instance of the RequestProcessor to use to process client request.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Server setRequestProcessor(RequestProcessor requestProcessor)
 	{
-		this.requestProcessor = requestProcessor;
+		if (requestProcessor != null)
+		{
+			this.requestProcessor = requestProcessor;
+		}
 		return this;
 	}
 
+	/**
+	 * Setter method to set the time to wait data to read from socket before closing.
+	 * @param duration Duration to wait before closing the socket connection while waiting for data to be read from socket.
+	 * @return The reference of the current object for chaining.
+	 */
 	public Server setTimeout(Duration duration)
 	{
 		this.timeoutInMilliSeconds = (int) duration.toMillis();
 		return this;
 	}
 
+	/**
+	 * Start the server and start listening to new connection from clients.
+	 */
 	public void start()
 	{
 		new Thread(() -> {
@@ -59,7 +80,6 @@ public class Server
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
 				stop();
 			}
 		}).start();
@@ -156,11 +176,12 @@ public class Server
 				}
 
 				// logging the request
-				Logger.getInstance().log(socket.getInetAddress().getHostAddress() + " " + method + " " + path);
+				String clientAddress = socket.getInetAddress().getHostAddress();
+				Logger.getInstance().log(clientAddress + " " + method + " " + path);
 
 				// generating the response
-				Request request = new Request(method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
-				Response response;
+				Request request = new Request(clientAddress, method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
+				Response response = null;
 				try
 				{
 					response = switch (method)
@@ -179,6 +200,9 @@ public class Server
 				} catch (Exception e)
 				{
 					e.printStackTrace();
+				}
+				if (response == null)
+				{
 					response = new Response().setStatusCode(500);
 				}
 
@@ -216,6 +240,7 @@ public class Server
 			} while (true);
 			socket.close();
 		}
+		catch (SocketTimeoutException ignored) {}
 		catch (Exception e)
 		{
 			e.printStackTrace();
@@ -245,6 +270,9 @@ public class Server
 		return temp.toString().trim();
 	}
 
+	/**
+	 * Stop the server to listen
+	 */
 	public void stop()
 	{
 		if (serverSocket != null)
