@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -31,7 +30,7 @@ public class Server
 		this.NAME = "Nebula";
 		this.VERSION = "HTTP/1.1";
 		this.requestProcessor = new RequestProcessor();
-		this.timeoutInMilliSeconds = 30000;
+		this.timeoutInMilliSeconds = 30000; // 30 seconds
 	}
 
 	void setServerSocket(ServerSocket serverSocket)
@@ -128,18 +127,21 @@ public class Server
 
 				// reading the request body
 				byte[] requestBody;
-				int bytesRead;
+				int bytesRead = 0;
 				String contentLength = requestHeaders.get(CONTENT_LENGTH);
 				if (contentLength != null)
 				{
 					int requestContentLength = Integer.parseInt(contentLength);
 					requestBody = new byte[requestContentLength];
-					bytesRead = is.read(requestBody, 0, requestContentLength);
+					do
+					{
+						int currentBytesRead =  is.read(requestBody, bytesRead, requestContentLength);
+						bytesRead += currentBytesRead;
+					} while (bytesRead < requestContentLength);
 				}
 				else
 				{
 					requestBody = new byte[0];
-					bytesRead = 0;
 				}
 
 				// extracting the path, request parameters and reference
@@ -181,30 +183,7 @@ public class Server
 
 				// generating the response
 				Request request = new Request(clientAddress, method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
-				Response response = null;
-				try
-				{
-					response = switch (method)
-							{
-								case "GET" -> requestProcessor.get(request);
-								case "HEAD" -> requestProcessor.head(request);
-								case "POST" -> requestProcessor.post(request);
-								case "PUT" -> requestProcessor.put(request);
-								case "DELETE" -> requestProcessor.delete(request);
-								case "CONNECT" -> requestProcessor.connect(request);
-								case "OPTIONS" -> requestProcessor.options(request);
-								case "TRACE" -> requestProcessor.trace(request);
-								case "PATCH" -> requestProcessor.patch(request);
-								default -> requestProcessor.none(request);
-							};
-				} catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-				if (response == null)
-				{
-					response = new Response().setStatusCode(500);
-				}
+				Response response = requestProcessor.process(request);
 
 				// sending the response status
 				os.write((VERSION + " " + response.statusCode() + " " + response.statusText() + LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8));
@@ -240,7 +219,6 @@ public class Server
 			} while (true);
 			socket.close();
 		}
-		catch (SocketTimeoutException ignored) {}
 		catch (Exception e)
 		{
 			e.printStackTrace();
@@ -261,10 +239,13 @@ public class Server
 		do
 		{
 			int b = is.read();
-			temp.append((char) b);
-			if (b == endChar)
+			if (b != -1)
 			{
-				break;
+				temp.append((char) b);
+				if (b == endChar)
+				{
+					break;
+				}
 			}
 		} while (true);
 		return temp.toString().trim();

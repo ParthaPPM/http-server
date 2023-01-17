@@ -12,6 +12,30 @@ public class RequestProcessor
 	public RequestProcessor()
 	{}
 
+	Response process(Request request)
+	{
+		try
+		{
+			return switch (request.method()) {
+				case "GET" -> get(request);
+				case "HEAD" -> head(request);
+				case "POST" -> post(request);
+				case "PUT" -> put(request);
+				case "DELETE" -> delete(request);
+				case "CONNECT" -> connect(request);
+				case "OPTIONS" -> options(request);
+				case "TRACE" -> trace(request);
+				case "PATCH" -> patch(request);
+				default -> none(request);
+			};
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return new Response().setStatusCode(500);
+		}
+	}
+
 	/**
 	 * This method handles all the GET requests.
 	 * @param request The request object created from the client request.
