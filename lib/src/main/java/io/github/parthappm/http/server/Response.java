@@ -117,8 +117,7 @@ public class Response
 
 	String statusText()
 	{
-		return switch (statusCode)
-		{
+		return switch (statusCode) {
 			case 100 -> "Continue";
 			case 101 -> "Switching Protocol";
 			case 102 -> "Processing";

@@ -11,7 +11,8 @@ public class MyRequestProcessor extends RequestProcessor
 	{
 		if (request.path().equals("/"))
 		{
-			return new Response("Hello").addHeader("Greeting", "Hello");
+			//return new Response("Hello").addHeader("Greeting", "Hello");
+			return fromFile("LICENSE");
 		}
 		else if (request.path().equals("/partha"))
 		{
@@ -23,5 +24,59 @@ public class MyRequestProcessor extends RequestProcessor
 		{
 			return new Response().setBody("Page not found");
 		}
+	}
+
+	@Override
+	public Response head(Request request)
+	{
+		return super.head(request);
+	}
+
+	@Override
+	public Response post(Request request)
+	{
+		return super.post(request);
+	}
+
+	@Override
+	public Response put(Request request)
+	{
+		return super.put(request);
+	}
+
+	@Override
+	public Response delete(Request request)
+	{
+		return super.delete(request);
+	}
+
+	@Override
+	public Response connect(Request request)
+	{
+		return super.connect(request);
+	}
+
+	@Override
+	public Response options(Request request)
+	{
+		return super.options(request);
+	}
+
+	@Override
+	public Response trace(Request request)
+	{
+		return super.trace(request);
+	}
+
+	@Override
+	public Response patch(Request request)
+	{
+		return super.patch(request);
+	}
+
+	@Override
+	public Response none(Request request)
+	{
+		return super.none(request);
 	}
 }

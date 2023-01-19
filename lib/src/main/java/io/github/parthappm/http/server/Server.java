@@ -29,6 +29,7 @@ public class Server
 	{
 		this.NAME = "Nebula";
 		this.VERSION = "HTTP/1.1";
+		this.serverSocket = null;
 		this.requestProcessor = new RequestProcessor();
 		this.timeoutInMilliSeconds = 30000; // 30 seconds
 	}
@@ -221,7 +222,6 @@ public class Server
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			try
 			{
 				socket.close();
