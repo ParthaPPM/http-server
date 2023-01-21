@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The RequestProcessor class which contains the logic to process the request and create the response.
@@ -11,7 +13,7 @@ import java.io.InputStream;
  */
 public class RequestProcessor
 {
-	private String rootDirectory;
+	private final Set<String> rootDirectoryList;
 
 	/**
 	 * Create an instance of this class.
@@ -22,22 +24,38 @@ public class RequestProcessor
 	}
 
 	/**
-	 * Create an instance of this class with specified file path as the root directory for html files
-	 * @param filePath File path of the root directory for the html files
+	 * Create an instance of this class with specified file path as the root directory for html files.
+	 * @param filePath File path of the root directory for the html files.
 	 */
 	public RequestProcessor(String filePath)
 	{
-		this.rootDirectory = absolutePath(filePath);
+		this.rootDirectoryList = new HashSet<>();
+		setRootDirectory(filePath);
 	}
 
 	/**
-	 * Setter method to set the root directory for serving html files
-	 *
-	 * @param filePath The root directory for html files
+	 * Setter method to add a new root directory to the set of root directories for serving html files.
+	 * @param filePath The root directory for html files.
+	 * @return Instance of current object for chaining.
 	 */
 	public RequestProcessor setRootDirectory(String filePath)
 	{
-		this.rootDirectory = absolutePath(filePath);
+		String rootDirectory = absolutePath(filePath);
+		if (rootDirectory != null)
+		{
+			rootDirectoryList.add(rootDirectory);
+		}
+		return this;
+	}
+
+	/**
+	 * Method to remove the root directory from the current set of root directories.
+	 * @param filePath the file path of the directory to be removed as a root directory.
+	 * @return Instance of current object for chaining.
+	 */
+	public RequestProcessor removeRootDirectory(String filePath)
+	{
+		rootDirectoryList.remove(absolutePath(filePath));
 		return this;
 	}
 
@@ -66,7 +84,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the GET requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -77,7 +94,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the HEAD requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -88,7 +104,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the POST requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -99,7 +114,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the PUT requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -110,7 +124,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the DELETE requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -121,7 +134,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the CONNECT requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -132,7 +144,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the OPTIONS requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -143,7 +154,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the TRACE requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -154,7 +164,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles all the PATCH requests.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -165,7 +174,6 @@ public class RequestProcessor
 
 	/**
 	 * This method handles any other type of HTTP request methods.
-	 *
 	 * @param request The request object created from the client request.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
@@ -175,23 +183,25 @@ public class RequestProcessor
 	}
 
 	/**
-	 * This method creates a response object with the content of the file as response body and required headers
-	 *
-	 * @param fileName The file name for the response body
+	 * This method creates a response object with the content of the file as response body and required headers.
+	 * @param fileName The file name for the response body.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
 	protected Response fromFile(String fileName)
 	{
-		if (rootDirectory != null && fileName != null)
+		if (fileName != null)
 		{
-			String absoluteFileName = absolutePath(rootDirectory + "/" + fileName);
-			if (absoluteFileName.startsWith(rootDirectory))
+			for (String rootDirectory : rootDirectoryList)
 			{
-				try (InputStream is = new FileInputStream(absoluteFileName))
+				String absoluteFileName = absolutePath(rootDirectory + "/" + fileName);
+				if (absoluteFileName.startsWith(rootDirectory))
 				{
-					return new Response(is.readAllBytes()).addHeader("Content-Type", getMimeType(absoluteFileName));
+					try (InputStream is = new FileInputStream(absoluteFileName))
+					{
+						return new Response(is.readAllBytes()).addHeader("Content-Type", getMimeType(absoluteFileName));
+					}
+					catch (IOException ignored) {}
 				}
-				catch (IOException ignored) {}
 			}
 		}
 		return new Response();

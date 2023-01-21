@@ -10,12 +10,13 @@ public class Main
 {
 	public static void main(String[] args) throws IOException
 	{
-		RequestProcessor requestProcessor = new RequestProcessor().setRootDirectory("");
+		RequestProcessor requestProcessor = new RequestProcessor("html1").setRootDirectory("html2");
+
 		Server httpServer = new HttpServer().setRequestProcessor(requestProcessor);
 		Server httpsServer = new HttpsServer()
 				.setKeyStore("", "")
-				.setRequestProcessor(new MyRequestProcessor())
-				.setTimeout(Duration.ofSeconds(20));
+				.setRequestProcessor(requestProcessor)
+				.setTimeout(Duration.ofSeconds(30));
 		httpServer.start();
 	}
 }
