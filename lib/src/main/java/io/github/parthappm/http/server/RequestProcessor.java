@@ -220,7 +220,13 @@ public class RequestProcessor
 		return null;
 	}
 
-	private String getMimeType(String fileName)
+	/**
+	 * This method return the mime type of the specified fileName based on the extension of the file.
+	 * If the fileName is empty string or no extension is present then empty string is returned.
+	 * @param fileName The file name
+	 * @return The mime type of the file based on the file extension
+	 */
+	protected String getMimeType(String fileName)
 	{
 		int dotIndex = fileName.lastIndexOf('.');
 		String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex+1).toLowerCase();
