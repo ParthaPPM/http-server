@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -194,7 +195,7 @@ public class RequestProcessor
 			for (String rootDirectory : rootDirectoryList)
 			{
 				String absoluteFileName = absolutePath(rootDirectory + "/" + fileName);
-				if (absoluteFileName.startsWith(rootDirectory))
+				if (absoluteFileName != null && absoluteFileName.startsWith(rootDirectory))
 				{
 					try (InputStream is = new FileInputStream(absoluteFileName))
 					{
@@ -207,17 +208,19 @@ public class RequestProcessor
 		return new Response();
 	}
 
-	private String absolutePath(String path)
+	/**
+	 * This method creates a response object with the content of the resource file as response body and required headers.
+	 * @param fileName The file name for the response body.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	protected Response fromResource(String fileName)
 	{
-		if (path != null)
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName))
 		{
-			try
-			{
-				return new File(path).getCanonicalPath();
-			}
-			catch (IOException ignored) {}
+			return new Response(Objects.requireNonNull(is).readAllBytes()).addHeader("Content-Type", getMimeType(fileName));
 		}
-		return null;
+		catch (IOException | NullPointerException ignored) {}
+		return new Response();
 	}
 
 	/**
@@ -303,5 +306,15 @@ public class RequestProcessor
 			case "7z" -> "application/x-7z-compressed";
 			default -> "application/octet-stream"; // "bin" is also considered as "application/octet-stream"
 		};
+	}
+
+	private String absolutePath(String path)
+	{
+		try
+		{
+			return new File(path).getCanonicalPath();
+		}
+		catch (IOException | NullPointerException ignored) {}
+		return null;
 	}
 }
