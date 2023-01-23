@@ -258,7 +258,8 @@ public class RequestProcessor
 			case "ics" -> "text/calendar";
 			case "jar" -> "application/java-archive";
 			case "jpeg", "jpg" -> "image/jpeg";
-			case "js", "mjs" -> "text/javascript";
+			case "js" -> "application/javascript";
+			case "mjs" -> "text/javascript";
 			case "json" -> "application/json";
 			case "jsonld" -> "application/ld+json";
 			case "mid", "midi" -> "audio/midi";
