@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A server class to implement the HTTP server functionality.
@@ -146,27 +148,25 @@ public class Server
 				}
 
 				// extracting the path, request parameters and reference
-				String[] parsedUrl = url.split("[?#]");
-				String path = parsedUrl.length >= 1 ? URLDecoder.decode(parsedUrl[0], StandardCharsets.UTF_8) : "";
-				String parametersString = parsedUrl.length >= 2 && url.contains("?") ? parsedUrl[1] : "";
-				String anchor;
-				if (parsedUrl.length >= 2)
+				Pattern urlPattern = Pattern.compile("(/[^?#]*)([?]([^#]*))?(#(.*))?");
+				Matcher urlMatcher = urlPattern.matcher(url);
+				String path, parametersString, anchor;
+				if (urlMatcher.find())
 				{
-					if (parsedUrl.length >= 3)
-					{
-						anchor = URLDecoder.decode(parsedUrl[2], StandardCharsets.UTF_8);
-					}
-					else
-					{
-						anchor = url.contains("#") ? URLDecoder.decode(parsedUrl[1], StandardCharsets.UTF_8) : "";
-					}
+					path = urlMatcher.group(1);
+					parametersString = urlMatcher.group(3);
+					anchor = urlMatcher.group(5);
 				}
 				else
 				{
-					anchor = "";
+					path = "/";
+					parametersString = null;
+					anchor = null;
 				}
+
+
 				Map<String, String> requestParameters = new HashMap<>();
-				if (parametersString.length() != 0)
+				if (parametersString != null && parametersString.length() != 0)
 				{
 					for (String parameter : parametersString.split("&"))
 					{
