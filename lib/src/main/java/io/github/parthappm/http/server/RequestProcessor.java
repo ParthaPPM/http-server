@@ -103,11 +103,11 @@ public class RequestProcessor
 			case "ics" -> "text/calendar";
 			case "jar" -> "application/java-archive";
 			case "jpeg", "jpg" -> "image/jpeg";
-			case "js" -> "application/javascript";
-			case "mjs" -> "text/javascript";
+			case "js", "mjs" -> "text/javascript";
 			case "json" -> "application/json";
 			case "jsonld" -> "application/ld+json";
 			case "mid", "midi" -> "audio/midi";
+			case "mkv" -> "video/x-matroska";
 			case "mp3" -> "audio/mpeg";
 			case "mp4" -> "video/mp4";
 			case "mpeg" -> "video/mpeg";
