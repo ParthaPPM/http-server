@@ -41,6 +41,33 @@ public class RequestProcessor
 		return null;
 	}
 
+	private byte[] readFromResource(String fileName)
+	{
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName))
+		{
+			return Objects.requireNonNull(is).readAllBytes();
+		}
+		catch (IOException | NullPointerException ignored) {}
+		return null;
+	}
+
+	private byte[] readFromFile(String fileName)
+	{
+		if (ROOT_DIRECTORY != null && fileName != null)
+		{
+			String absoluteFileName = absolutePath(ROOT_DIRECTORY + "/" + fileName);
+			if (absoluteFileName != null && absoluteFileName.startsWith(ROOT_DIRECTORY))
+			{
+				try (InputStream is = new FileInputStream(absoluteFileName))
+				{
+					return Objects.requireNonNull(is).readAllBytes();
+				}
+				catch (IOException | NullPointerException ignored) {}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * This method return the mime type of the specified fileName based on the extension of the file.
 	 * If the fileName is empty string or no extension is present then empty string is returned.
@@ -128,18 +155,35 @@ public class RequestProcessor
 	}
 
 	/**
+	 * This method creates the response object with a particular error code.
+	 * @param status The http error response code.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	protected Response error(int status)
+	{
+		String errorFileName = "error/" + status + ".html";
+		byte[] responseBodyFromFile = readFromFile(errorFileName);
+		return new Response(status)
+				.addHeader("Content-Type", getMimeType(errorFileName))
+				.setBody((responseBodyFromFile == null) ? readFromResource(errorFileName) : responseBodyFromFile);
+	}
+
+	/**
 	 * This method creates a response object with the content of the resource file as response body and required headers.
 	 * @param fileName The file name for the response body.
 	 * @return Returns an instance of Response class containing all the details.
 	 */
 	protected Response fromResource(String fileName)
 	{
-		try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName))
+		byte[] responseBody = readFromResource(fileName);
+		if (responseBody != null)
 		{
-			return new Response(Objects.requireNonNull(is).readAllBytes()).addHeader("Content-Type", getMimeType(fileName));
+			return new Response(responseBody).addHeader("Content-Type", getMimeType(fileName));
 		}
-		catch (IOException | NullPointerException ignored) {}
-		return new Response();
+		else
+		{
+			return error(404);
+		}
 	}
 
 	/**
@@ -149,25 +193,15 @@ public class RequestProcessor
 	 */
 	protected Response fromFile(String fileName)
 	{
-		if (fileName != null)
+		byte[] responseBody = readFromFile(fileName);
+		if (responseBody != null)
 		{
-			String absoluteFileName = absolutePath(ROOT_DIRECTORY + "/" + fileName);
-			if (absoluteFileName != null && absoluteFileName.startsWith(ROOT_DIRECTORY))
-			{
-				try (InputStream is = new FileInputStream(absoluteFileName))
-				{
-					return new Response(is.readAllBytes()).addHeader("Content-Type", getMimeType(absoluteFileName));
-				}
-				catch (IOException ignored) {}
-			}
+			return new Response(responseBody).addHeader("Content-Type", getMimeType(fileName));
 		}
-		return new Response();
-	}
-
-	protected Response error(int status)
-	{
-		String errorFileName = "html/" + status + ".html";
-		return fromResource(errorFileName).setStatusCode(status);
+		else
+		{
+			return error(404);
+		}
 	}
 
 	Response process(Request request)
