@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * The RequestProcessor class which contains the logic to process the request and create the response.
@@ -14,7 +12,7 @@ import java.util.Set;
  */
 public class RequestProcessor
 {
-	private final Set<String> rootDirectoryList;
+	private final String ROOT_DIRECTORY;
 
 	/**
 	 * Create an instance of this class.
@@ -30,197 +28,17 @@ public class RequestProcessor
 	 */
 	public RequestProcessor(String filePath)
 	{
-		this.rootDirectoryList = new HashSet<>();
-		setRootDirectory(filePath);
+		this.ROOT_DIRECTORY = absolutePath(filePath);
 	}
 
-	/**
-	 * Setter method to add a new root directory to the set of root directories for serving html files.
-	 * @param filePath The root directory for html files.
-	 * @return Instance of current object for chaining.
-	 */
-	public RequestProcessor setRootDirectory(String filePath)
-	{
-		String rootDirectory = absolutePath(filePath);
-		if (rootDirectory != null)
-		{
-			rootDirectoryList.add(rootDirectory);
-		}
-		return this;
-	}
-
-	/**
-	 * Method to remove the root directory from the current set of root directories.
-	 * @param filePath the file path of the directory to be removed as a root directory.
-	 * @return Instance of current object for chaining.
-	 */
-	public RequestProcessor removeRootDirectory(String filePath)
-	{
-		rootDirectoryList.remove(absolutePath(filePath));
-		return this;
-	}
-
-	Response process(Request request)
+	private String absolutePath(String path)
 	{
 		try
 		{
-			return switch (request.method()) {
-				case "GET" -> get(request);
-				case "HEAD" -> head(request);
-				case "POST" -> post(request);
-				case "PUT" -> put(request);
-				case "DELETE" -> delete(request);
-				case "CONNECT" -> connect(request);
-				case "OPTIONS" -> options(request);
-				case "TRACE" -> trace(request);
-				case "PATCH" -> patch(request);
-				default -> none(request);
-			};
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			return new Response().setStatusCode(500);
-		}
-	}
-
-	/**
-	 * This method handles all the GET requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response get(Request request)
-	{
-		return fromFile(request.path());
-	}
-
-	/**
-	 * This method handles all the HEAD requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response head(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the POST requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response post(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the PUT requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response put(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the DELETE requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response delete(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the CONNECT requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response connect(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the OPTIONS requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response options(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the TRACE requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response trace(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles all the PATCH requests.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response patch(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method handles any other type of HTTP request methods.
-	 * @param request The request object created from the client request.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	public Response none(Request request)
-	{
-		return new Response(405);
-	}
-
-	/**
-	 * This method creates a response object with the content of the file as response body and required headers.
-	 * @param fileName The file name for the response body.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	protected Response fromFile(String fileName)
-	{
-		if (fileName != null)
-		{
-			for (String rootDirectory : rootDirectoryList)
-			{
-				String absoluteFileName = absolutePath(rootDirectory + "/" + fileName);
-				if (absoluteFileName != null && absoluteFileName.startsWith(rootDirectory))
-				{
-					try (InputStream is = new FileInputStream(absoluteFileName))
-					{
-						return new Response(is.readAllBytes()).addHeader("Content-Type", getMimeType(absoluteFileName));
-					}
-					catch (IOException ignored) {}
-				}
-			}
-		}
-		return new Response();
-	}
-
-	/**
-	 * This method creates a response object with the content of the resource file as response body and required headers.
-	 * @param fileName The file name for the response body.
-	 * @return Returns an instance of Response class containing all the details.
-	 */
-	protected Response fromResource(String fileName)
-	{
-		try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName))
-		{
-			return new Response(Objects.requireNonNull(is).readAllBytes()).addHeader("Content-Type", getMimeType(fileName));
+			return new File(Objects.requireNonNull(path)).getCanonicalPath();
 		}
 		catch (IOException | NullPointerException ignored) {}
-		return new Response();
+		return null;
 	}
 
 	/**
@@ -309,13 +127,169 @@ public class RequestProcessor
 		};
 	}
 
-	private String absolutePath(String path)
+	/**
+	 * This method creates a response object with the content of the resource file as response body and required headers.
+	 * @param fileName The file name for the response body.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	protected Response fromResource(String fileName)
+	{
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName))
+		{
+			return new Response(Objects.requireNonNull(is).readAllBytes()).addHeader("Content-Type", getMimeType(fileName));
+		}
+		catch (IOException | NullPointerException ignored) {}
+		return new Response();
+	}
+
+	/**
+	 * This method creates a response object with the content of the file as response body and required headers.
+	 * @param fileName The file name for the response body.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	protected Response fromFile(String fileName)
+	{
+		if (fileName != null)
+		{
+			String absoluteFileName = absolutePath(ROOT_DIRECTORY + "/" + fileName);
+			if (absoluteFileName != null && absoluteFileName.startsWith(ROOT_DIRECTORY))
+			{
+				try (InputStream is = new FileInputStream(absoluteFileName))
+				{
+					return new Response(is.readAllBytes()).addHeader("Content-Type", getMimeType(absoluteFileName));
+				}
+				catch (IOException ignored) {}
+			}
+		}
+		return new Response();
+	}
+
+	protected Response error(int status)
+	{
+		String errorFileName = "html/" + status + ".html";
+		return fromResource(errorFileName).setStatusCode(status);
+	}
+
+	Response process(Request request)
 	{
 		try
 		{
-			return new File(path).getCanonicalPath();
+			return switch (request.method()) {
+				case "GET" -> get(request);
+				case "HEAD" -> head(request);
+				case "POST" -> post(request);
+				case "PUT" -> put(request);
+				case "DELETE" -> delete(request);
+				case "CONNECT" -> connect(request);
+				case "OPTIONS" -> options(request);
+				case "TRACE" -> trace(request);
+				case "PATCH" -> patch(request);
+				default -> none(request);
+			};
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return new Response().setStatusCode(500);
 		}
-		catch (IOException | NullPointerException ignored) {}
-		return null;
+	}
+
+	/**
+	 * This method handles all the GET requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response get(Request request)
+	{
+		return fromFile(request.path());
+	}
+
+	/**
+	 * This method handles all the HEAD requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response head(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the POST requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response post(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the PUT requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response put(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the DELETE requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response delete(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the CONNECT requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response connect(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the OPTIONS requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response options(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the TRACE requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response trace(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles all the PATCH requests.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response patch(Request request)
+	{
+		return error(405);
+	}
+
+	/**
+	 * This method handles any other type of HTTP request methods.
+	 * @param request The request object created from the client request.
+	 * @return Returns an instance of Response class containing all the details.
+	 */
+	public Response none(Request request)
+	{
+		return error(405);
 	}
 }
