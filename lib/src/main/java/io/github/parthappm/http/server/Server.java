@@ -9,7 +9,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -21,16 +20,14 @@ import java.util.regex.Pattern;
  */
 public class Server
 {
-	private final String NAME;
-	private final String VERSION;
+	private final ApplicationProperties properties;
 	private ServerSocket serverSocket;
 	private RequestProcessor requestProcessor;
 	private int timeoutInMilliSeconds;
 
 	Server()
 	{
-		this.NAME = "Nebula";
-		this.VERSION = "HTTP/1.1";
+		this.properties = ApplicationProperties.getInstance();
 		this.serverSocket = null;
 		this.requestProcessor = new RequestProcessor();
 		this.timeoutInMilliSeconds = 30000; // 30 seconds
@@ -187,12 +184,12 @@ public class Server
 				Response response = requestProcessor.process(request);
 
 				// sending the response status
-				os.write((VERSION + " " + response.statusCode() + " " + response.statusText() + LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8));
+				os.write((properties.httpVersion() + " " + response.statusCode() + " " + response.statusText() + LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8));
 
 				// sending the headers
 				Map<String, String> responseHeaders = response.headers();
-				responseHeaders.put("Date", (new Date()).toString());
-				responseHeaders.put("Server", NAME);
+				responseHeaders.put("Date", properties.timestampForResponse());
+				responseHeaders.put("Server", properties.serverName());
 				responseHeaders.put("Content-Length", String.valueOf(response.body().length));
 				for (String key : responseHeaders.keySet())
 				{
