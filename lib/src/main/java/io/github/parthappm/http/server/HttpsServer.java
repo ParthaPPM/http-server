@@ -20,7 +20,7 @@ public class HttpsServer extends Server
 	 */
 	public HttpsServer()
 	{
-		this(443);
+		this(ApplicationProperties.getInstance().defaultHttpsPort());
 	}
 
 	/**

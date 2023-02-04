@@ -10,8 +10,11 @@ import java.util.TimeZone;
 class ApplicationProperties
 {
 	private static ApplicationProperties currentProperties;
-	private final String SERVER_NAME;
+	private final int DEFAULT_HTTP_PORT;
+	private final int DEFAULT_HTTPS_PORT;
+	private final int SERVER_TIMEOUT_IN_MILLIS;
 	private final String HTTP_VERSION;
+	private final String SERVER_NAME;
 	private final String LOG_FILE_NAME_PREFIX;
 	private final SimpleDateFormat RESPONSE_DATE_FORMAT;
 
@@ -23,8 +26,12 @@ class ApplicationProperties
 			properties.load(is);
 		}
 		catch (IOException | NullPointerException ignored) {}
-		this.SERVER_NAME = properties.getProperty("serverName");
+
+		this.DEFAULT_HTTP_PORT = 80;
+		this.DEFAULT_HTTPS_PORT = 443;
+		this.SERVER_TIMEOUT_IN_MILLIS = 30000; // 30 seconds
 		this.HTTP_VERSION = "HTTP/1.1";
+		this.SERVER_NAME = properties.getProperty("serverName");
 		this.LOG_FILE_NAME_PREFIX = properties.getProperty("logFilePrefix");
 		this.RESPONSE_DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 		this.RESPONSE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -39,14 +46,29 @@ class ApplicationProperties
 		return currentProperties;
 	}
 
-	String serverName()
+	int defaultHttpPort()
 	{
-		return SERVER_NAME == null ? "Nebula" : SERVER_NAME;
+		return this.DEFAULT_HTTP_PORT;
+	}
+
+	int defaultHttpsPort()
+	{
+		return this.DEFAULT_HTTPS_PORT;
+	}
+
+	int serverTimeout()
+	{
+		return this.SERVER_TIMEOUT_IN_MILLIS;
 	}
 
 	String httpVersion()
 	{
 		return HTTP_VERSION;
+	}
+
+	String serverName()
+	{
+		return SERVER_NAME == null ? "Nebula" : SERVER_NAME;
 	}
 
 	String timestampForResponse()

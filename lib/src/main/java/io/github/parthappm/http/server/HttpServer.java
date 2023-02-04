@@ -17,7 +17,7 @@ public class HttpServer extends Server
 	 */
 	public HttpServer()
 	{
-		this(80);
+		this(ApplicationProperties.getInstance().defaultHttpPort());
 	}
 
 	/**
