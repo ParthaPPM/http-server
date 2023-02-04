@@ -37,7 +37,10 @@ public class RequestProcessor
 		{
 			return new File(Objects.requireNonNull(path)).getCanonicalPath();
 		}
-		catch (IOException | NullPointerException ignored) {}
+		catch (IOException | NullPointerException e)
+		{
+			Log.getInstance().debug(e);
+		}
 		return null;
 	}
 
@@ -47,7 +50,10 @@ public class RequestProcessor
 		{
 			return Objects.requireNonNull(is).readAllBytes();
 		}
-		catch (IOException | NullPointerException ignored) {}
+		catch (IOException | NullPointerException e)
+		{
+			Log.getInstance().debug(e);
+		}
 		return null;
 	}
 
@@ -62,7 +68,10 @@ public class RequestProcessor
 				{
 					return Objects.requireNonNull(is).readAllBytes();
 				}
-				catch (IOException | NullPointerException ignored) {}
+				catch (IOException | NullPointerException e)
+				{
+					Log.getInstance().debug(e);
+				}
 			}
 		}
 		return null;
@@ -222,7 +231,7 @@ public class RequestProcessor
 			};
 		} catch (Exception e)
 		{
-			e.printStackTrace();
+			Log.getInstance().error(e);
 			return new Response().setStatusCode(500);
 		}
 	}

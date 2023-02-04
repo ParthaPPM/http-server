@@ -25,7 +25,10 @@ class ApplicationProperties
 		{
 			properties.load(is);
 		}
-		catch (IOException | NullPointerException ignored) {}
+		catch (IOException | NullPointerException e)
+		{
+			Log.getInstance().debug(e);
+		}
 
 		this.DEFAULT_HTTP_PORT = 80;
 		this.DEFAULT_HTTPS_PORT = 443;

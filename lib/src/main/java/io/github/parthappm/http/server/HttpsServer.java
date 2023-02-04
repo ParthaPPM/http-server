@@ -62,7 +62,7 @@ public class HttpsServer extends Server
 	 */
 	public void start()
 	{
-		System.out.println("Starting server at port: " + port);
+		Log.getInstance().info("Starting server at port: " + port);
 		System.setProperty("javax.net.ssl.keyStore", keyStoreFileName);
 		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
 		ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
@@ -72,7 +72,7 @@ public class HttpsServer extends Server
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException(e);
+			Log.getInstance().error(e);
 		}
 		super.start();
 	}

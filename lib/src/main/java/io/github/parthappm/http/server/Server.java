@@ -30,7 +30,7 @@ public class Server
 		this.properties = ApplicationProperties.getInstance();
 		this.serverSocket = null;
 		this.requestProcessor = new RequestProcessor();
-		this.timeoutInMilliSeconds = 30000; // 30 seconds
+		this.timeoutInMilliSeconds = properties.serverTimeout();
 	}
 
 	void setServerSocket(ServerSocket serverSocket)
@@ -79,10 +79,11 @@ public class Server
 			}
 			catch (IOException e)
 			{
+				Log.getInstance().debug(e);
 				stop();
 			}
 		}).start();
-		System.out.println("Server started...");
+		Log.getInstance().info("Server started...");
 	}
 
 	private void handleRequest(Socket socket)
@@ -177,7 +178,7 @@ public class Server
 
 				// logging the request
 				String clientAddress = socket.getInetAddress().getHostAddress();
-				Logger.getInstance().log(clientAddress + " " + method + " " + path);
+				Log.getInstance().log(clientAddress + " " + method + " " + path);
 
 				// generating the response
 				Request request = new Request(clientAddress, method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
@@ -219,13 +220,14 @@ public class Server
 		}
 		catch (Exception e)
 		{
+			Log.getInstance().debug(e);
 			try
 			{
 				socket.close();
 			}
 			catch (IOException ex)
 			{
-				ex.printStackTrace();
+				Log.getInstance().error(ex);
 			}
 		}
 	}
@@ -258,11 +260,11 @@ public class Server
 			try
 			{
 				serverSocket.close();
-				System.out.println("Server stopped!");
+				Log.getInstance().info("Server stopped!");
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				Log.getInstance().error(e);
 			}
 			serverSocket = null;
 		}
