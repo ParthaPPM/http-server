@@ -37,10 +37,7 @@ public class RequestProcessor
 		{
 			return new File(Objects.requireNonNull(path)).getCanonicalPath();
 		}
-		catch (IOException | NullPointerException e)
-		{
-			Log.getInstance().debug(e);
-		}
+		catch (IOException | NullPointerException ignored) {}
 		return null;
 	}
 
@@ -52,7 +49,7 @@ public class RequestProcessor
 		}
 		catch (IOException | NullPointerException e)
 		{
-			Log.getInstance().debug(e);
+			Log.getInstance().debug("Resource not found: " + fileName);
 		}
 		return null;
 	}
@@ -70,7 +67,7 @@ public class RequestProcessor
 				}
 				catch (IOException | NullPointerException e)
 				{
-					Log.getInstance().debug(e);
+					Log.getInstance().debug("File not found in http root directory: " + fileName);
 				}
 			}
 		}

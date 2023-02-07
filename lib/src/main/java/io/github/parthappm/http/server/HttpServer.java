@@ -45,10 +45,13 @@ public class HttpServer extends Server
 	 */
 	public void start()
 	{
-		Log.getInstance().info("Starting server at port: " + port);
+		Log.getInstance().info("Starting server...");
+		Log.getInstance().debug("Port: " + port);
+		Log.getInstance().debug("Host: " + host);
 		try
 		{
 			setServerSocket(new ServerSocket(port, 0, host == null ? null : InetAddress.getByName(host)));
+			Log.getInstance().info("Server started at port: " + port);
 		}
 		catch (IOException e)
 		{

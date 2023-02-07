@@ -68,22 +68,25 @@ public class Server
 	 */
 	public void start()
 	{
-		new Thread(() -> {
+		Thread server = new Thread(() -> {
 			try
 			{
-				do
+				while (serverSocket != null)
 				{
 					Socket socket = serverSocket.accept();
-					new Thread(() -> handleRequest(socket)).start();
-				} while (serverSocket != null);
+					Thread handler = new Thread(() -> handleRequest(socket));
+					handler.setName("handler");
+					handler.start();
+				}
 			}
 			catch (IOException e)
 			{
 				Log.getInstance().debug(e);
 				stop();
 			}
-		}).start();
-		Log.getInstance().info("Server started...");
+		});
+		server.setName("server");
+		server.start();
 	}
 
 	private void handleRequest(Socket socket)
@@ -176,13 +179,11 @@ public class Server
 					}
 				}
 
-				// logging the request
-				String clientAddress = socket.getInetAddress().getHostAddress();
-				Log.getInstance().log(clientAddress + " " + method + " " + path);
-
 				// generating the response
-				Request request = new Request(clientAddress, method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
+				Request request = new Request(socket.getInetAddress().getHostAddress(), method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
+				Log.getInstance().debug(request);
 				Response response = requestProcessor.process(request);
+				Log.getInstance().debug(response);
 
 				// sending the response status
 				os.write((properties.httpVersion() + " " + response.statusCode() + " " + response.statusText() + LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8));
@@ -246,6 +247,7 @@ public class Server
 					break;
 				}
 			}
+			// TODO loop gets stuck here
 		} while (true);
 		return temp.toString().trim();
 	}
@@ -268,5 +270,6 @@ public class Server
 			}
 			serverSocket = null;
 		}
+		Log.getInstance().stop();
 	}
 }

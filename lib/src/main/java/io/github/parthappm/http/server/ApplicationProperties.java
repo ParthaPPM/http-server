@@ -27,15 +27,15 @@ class ApplicationProperties
 		}
 		catch (IOException | NullPointerException e)
 		{
-			Log.getInstance().debug(e);
+			Log.getInstance().debug("File: application.properties not found.");
 		}
 
 		this.DEFAULT_HTTP_PORT = 80;
 		this.DEFAULT_HTTPS_PORT = 443;
 		this.SERVER_TIMEOUT_IN_MILLIS = 30000; // 30 seconds
 		this.HTTP_VERSION = "HTTP/1.1";
-		this.SERVER_NAME = properties.getProperty("serverName");
-		this.LOG_FILE_NAME_PREFIX = properties.getProperty("logFilePrefix");
+		this.SERVER_NAME = properties.getProperty("serverName", "Nebula");
+		this.LOG_FILE_NAME_PREFIX = properties.getProperty("logFilePrefix", "");
 		this.RESPONSE_DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 		this.RESPONSE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
@@ -71,7 +71,7 @@ class ApplicationProperties
 
 	String serverName()
 	{
-		return SERVER_NAME == null ? "Nebula" : SERVER_NAME;
+		return SERVER_NAME;
 	}
 
 	String timestampForResponse()
@@ -81,6 +81,6 @@ class ApplicationProperties
 
 	String logFileName()
 	{
-		return LOG_FILE_NAME_PREFIX == null ? "" : LOG_FILE_NAME_PREFIX;
+		return LOG_FILE_NAME_PREFIX.equals("") ? "" : LOG_FILE_NAME_PREFIX + ".log";
 	}
 }
