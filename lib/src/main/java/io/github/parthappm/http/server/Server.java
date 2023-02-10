@@ -68,15 +68,13 @@ public class Server
 	 */
 	public void start()
 	{
-		Thread server = new Thread(() -> {
+		new Thread(() -> {
 			try
 			{
 				while (serverSocket != null)
 				{
 					Socket socket = serverSocket.accept();
-					Thread handler = new Thread(() -> handleRequest(socket));
-					handler.setName("handler");
-					handler.start();
+					new Thread(() -> handleRequest(socket)).start();
 				}
 			}
 			catch (IOException e)
@@ -84,9 +82,7 @@ public class Server
 				Log.getInstance().debug(e);
 				stop();
 			}
-		});
-		server.setName("server");
-		server.start();
+		}).start();
 	}
 
 	private void handleRequest(Socket socket)
@@ -239,15 +235,15 @@ public class Server
 		do
 		{
 			int b = is.read();
-			if (b != -1)
+			if (b == -1)
 			{
-				temp.append((char) b);
-				if (b == endChar)
-				{
-					break;
-				}
+				break;
 			}
-			// TODO loop gets stuck here
+			temp.append((char) b);
+			if (b == endChar)
+			{
+				break;
+			}
 		} while (true);
 		return temp.toString().trim();
 	}

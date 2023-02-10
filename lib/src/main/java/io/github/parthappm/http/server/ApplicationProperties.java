@@ -34,7 +34,7 @@ class ApplicationProperties
 		this.DEFAULT_HTTPS_PORT = 443;
 		this.SERVER_TIMEOUT_IN_MILLIS = 30000; // 30 seconds
 		this.HTTP_VERSION = "HTTP/1.1";
-		this.SERVER_NAME = properties.getProperty("serverName", "Nebula");
+		this.SERVER_NAME = properties.getProperty("serverName", "");
 		this.LOG_FILE_NAME_PREFIX = properties.getProperty("logFilePrefix", "");
 		this.RESPONSE_DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 		this.RESPONSE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -71,7 +71,7 @@ class ApplicationProperties
 
 	String serverName()
 	{
-		return SERVER_NAME;
+		return SERVER_NAME.equals("") ? "Nebula" : SERVER_NAME;
 	}
 
 	String timestampForResponse()

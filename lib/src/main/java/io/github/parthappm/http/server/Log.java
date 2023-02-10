@@ -29,7 +29,7 @@ class Log
 		this.STOP = "STOP";
 
 		// log consumer
-		Thread consumer = new Thread(() -> {
+		new Thread(() -> {
 			while (true)
 			{
 				try
@@ -49,9 +49,7 @@ class Log
 				}
 				catch (InterruptedException ignored) {}
 			}
-		});
-		consumer.setName("consumer");
-		consumer.start();
+		}).start();
 	}
 
 	static Log getInstance()
@@ -75,7 +73,7 @@ class Log
 
 	private void log(String logType, Object object)
 	{
-		Thread producer = new Thread(() -> {
+		new Thread(() -> {
 			String logDate = dateFormat.format(new Date());
 			try
 			{
@@ -121,9 +119,7 @@ class Log
 				}
 			}
 			catch (InterruptedException ignored) {}
-		});
-		producer.setName("producer");
-		producer.start();
+		}).start();
 	}
 
 	void info(Object object)
