@@ -27,29 +27,7 @@ class Log
 		this.DEBUG = "DEBUG";
 		this.ERROR = "ERROR";
 		this.STOP = "STOP";
-
-		// log consumer
-		new Thread(() -> {
-			while (true)
-			{
-				try
-				{
-					LogBean logItem = logQueue.take();
-					String logType = logItem.type();
-					String logText = logItem.date() + " [" + logType + "] " + logItem.message();
-					if (logType.equals(INFO) || logType.equals(ERROR))
-					{
-						System.out.println(logText);
-					}
-					writeToFile(logText);
-					if (logType.equals(STOP))
-					{
-						break;
-					}
-				}
-				catch (InterruptedException ignored) {}
-			}
-		}).start();
+		new Thread(this::consumeLog).start();
 	}
 
 	static Log getInstance()
@@ -71,55 +49,81 @@ class Log
 		catch (IOException ignored) {}
 	}
 
-	private void log(String logType, Object object)
+	private void consumeLog()
 	{
-		new Thread(() -> {
-			String logDate = dateFormat.format(new Date());
+		while (true)
+		{
 			try
 			{
-				if (object instanceof String message)
+				LogBean logItem = logQueue.take();
+				String logType = logItem.type();
+				String logText = logItem.date() + " [" + logType + "] " + logItem.message();
+				if (logType.equals(INFO) || logType.equals(ERROR))
 				{
-					logQueue.put(new LogBean(logDate, logType, message));
+					System.out.println(logText);
 				}
-				else if (object instanceof Request request)
+				writeToFile(logText);
+				if (logType.equals(STOP))
 				{
-					String statusLine = request.ip() + " " + request.method() + " " + request.path() + " " + request.anchor();
-					StringBuilder parameters = new StringBuilder();
-					StringBuilder headers = new StringBuilder();
-					request.parameters().forEach((key, value) -> parameters.append(key).append(": ").append(value).append(System.lineSeparator()));
-					request.headers().forEach((key, value) -> headers.append(key).append(": ").append(value).append(System.lineSeparator()));
-					logQueue.put(new LogBean(logDate, INFO, statusLine));
-					logQueue.put(new LogBean(logDate, DEBUG, "Request Parameters:"));
-					logQueue.put(new LogBean(logDate, DEBUG, parameters.toString()));
-					logQueue.put(new LogBean(logDate, DEBUG, "Request Headers:"));
-					logQueue.put(new LogBean(logDate, DEBUG, headers.toString()));
-					logQueue.put(new LogBean(logDate, DEBUG, "Request Body:"));
-					logQueue.put(new LogBean(logDate, DEBUG, new String(request.body(), StandardCharsets.UTF_8)));
-				}
-				else if (object instanceof Response response)
-				{
-					String statusLine = response.statusCode() + " " + response.statusText();
-					StringBuilder headers = new StringBuilder();
-					response.headers().forEach((key, value) -> headers.append(key).append(": ").append(value).append(System.lineSeparator()));
-					logQueue.put(new LogBean(logDate, INFO, statusLine));
-					logQueue.put(new LogBean(logDate, DEBUG, "Response Headers:"));
-					logQueue.put(new LogBean(logDate, DEBUG, headers.toString()));
-					logQueue.put(new LogBean(logDate, DEBUG, "Response Body:"));
-					logQueue.put(new LogBean(logDate, DEBUG, new String(response.body(), StandardCharsets.UTF_8)));
-				}
-				else if (object instanceof Exception exception)
-				{
-					StringWriter sw = new StringWriter();
-					exception.printStackTrace(new PrintWriter(sw));
-					logQueue.put(new LogBean(logDate, logType, sw.toString()));
-				}
-				else
-				{
-					logQueue.put(new LogBean(logDate, logType, object.toString()));
+					break;
 				}
 			}
 			catch (InterruptedException ignored) {}
-		}).start();
+		}
+	}
+
+	private void produceLog(String logType, Object object)
+	{
+		String logDate = dateFormat.format(new Date());
+		try
+		{
+			if (object instanceof String message)
+			{
+				logQueue.put(new LogBean(logDate, logType, message));
+			}
+			else if (object instanceof Request request)
+			{
+				String statusLine = request.ip() + " " + request.method() + " " + request.path() + " " + request.anchor();
+				StringBuilder parameters = new StringBuilder();
+				StringBuilder headers = new StringBuilder();
+				request.parameters().forEach((key, value) -> parameters.append(key).append(": ").append(value).append(System.lineSeparator()));
+				request.headers().forEach((key, value) -> headers.append(key).append(": ").append(value).append(System.lineSeparator()));
+				logQueue.put(new LogBean(logDate, INFO, statusLine));
+				logQueue.put(new LogBean(logDate, DEBUG, "Request Parameters:"));
+				logQueue.put(new LogBean(logDate, DEBUG, parameters.toString()));
+				logQueue.put(new LogBean(logDate, DEBUG, "Request Headers:"));
+				logQueue.put(new LogBean(logDate, DEBUG, headers.toString()));
+				logQueue.put(new LogBean(logDate, DEBUG, "Request Body:"));
+				logQueue.put(new LogBean(logDate, DEBUG, new String(request.body(), StandardCharsets.UTF_8)));
+			}
+			else if (object instanceof Response response)
+			{
+				String statusLine = response.statusCode() + " " + response.statusText();
+				StringBuilder headers = new StringBuilder();
+				response.headers().forEach((key, value) -> headers.append(key).append(": ").append(value).append(System.lineSeparator()));
+				logQueue.put(new LogBean(logDate, INFO, statusLine));
+				logQueue.put(new LogBean(logDate, DEBUG, "Response Headers:"));
+				logQueue.put(new LogBean(logDate, DEBUG, headers.toString()));
+				logQueue.put(new LogBean(logDate, DEBUG, "Response Body:"));
+				logQueue.put(new LogBean(logDate, DEBUG, new String(response.body(), StandardCharsets.UTF_8)));
+			}
+			else if (object instanceof Exception exception)
+			{
+				StringWriter sw = new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				logQueue.put(new LogBean(logDate, logType, sw.toString()));
+			}
+			else
+			{
+				logQueue.put(new LogBean(logDate, logType, object.toString()));
+			}
+		}
+		catch (InterruptedException ignored) {}
+	}
+
+	private void log(String logType, Object object)
+	{
+		new Thread(() -> produceLog(logType, object)).start();
 	}
 
 	void info(Object object)
