@@ -17,7 +17,7 @@ public class HttpServer extends Server
 	 */
 	public HttpServer()
 	{
-		this(ApplicationProperties.getInstance().defaultHttpPort());
+		this(ApplicationProperties.getInstance().httpPort());
 	}
 
 	/**
@@ -45,7 +45,6 @@ public class HttpServer extends Server
 	 */
 	public void start()
 	{
-		Log.getInstance().info("Starting server...");
 		Log.getInstance().debug("Port: " + port);
 		Log.getInstance().debug("Host: " + host);
 		try

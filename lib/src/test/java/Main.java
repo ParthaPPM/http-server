@@ -15,7 +15,11 @@ public class Main
 		RequestProcessor requestProcessor1 = new MyRequestProcessor();
 		RequestProcessor requestProcessor2 = new RequestProcessor();
 
-		Server httpServer = new HttpServer().setRequestProcessor(requestProcessor2);
+		Server httpServer = new HttpServer()
+				.setRequestProcessor(requestProcessor2)
+				.setServerName("Test Server")
+				.setLogFileName("server.log")
+				.logResponse(true);
 		Server httpsServer = new HttpsServer()
 				.setKeyStore("", "")
 				.setRequestProcessor(requestProcessor1)

@@ -39,6 +39,39 @@ public class Server
 	}
 
 	/**
+	 * Setter method to set the name of the server. This name is returned within the http response header.
+	 * @param serverName The name of the server
+	 * @return The reference of the current object for chaining.
+	 */
+	public Server setServerName(String serverName)
+	{
+		properties.setServerName(serverName);
+		return this;
+	}
+
+	/**
+	 * Setter method to set the desired log file name.
+	 * @param fileName The name of the log file.
+	 * @return The reference of the current object for chaining.
+	 */
+	public Server setLogFileName(String fileName)
+	{
+		properties.setLogFileName(fileName);
+		return this;
+	}
+
+	/**
+	 * Setter method to tell whether the response body is to be written in the log file or not.
+	 * @param flag True means to log the response body.
+	 * @return The reference of the current object for chaining.
+	 */
+	public Server logResponse(boolean flag)
+	{
+		properties.setLogResponse(flag);
+		return this;
+	}
+
+	/**
 	 * Setter method to set the RequestProcessor for the server.
 	 * @param requestProcessor The instance of the RequestProcessor to use to process client request.
 	 * @return The reference of the current object for chaining.

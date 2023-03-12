@@ -20,7 +20,7 @@ public class HttpsServer extends Server
 	 */
 	public HttpsServer()
 	{
-		this(ApplicationProperties.getInstance().defaultHttpsPort());
+		this(ApplicationProperties.getInstance().httpsPort());
 	}
 
 	/**
@@ -62,7 +62,6 @@ public class HttpsServer extends Server
 	 */
 	public void start()
 	{
-		Log.getInstance().info("Starting server...");
 		Log.getInstance().debug("Port: " + port);
 		Log.getInstance().debug("Host: " + host);
 		Log.getInstance().debug("Keystore file name: " + keyStoreFileName);
