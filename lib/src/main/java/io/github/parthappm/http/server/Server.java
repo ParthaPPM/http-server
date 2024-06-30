@@ -5,11 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,246 +19,86 @@ import java.util.regex.Pattern;
  */
 public class Server
 {
-	private final ApplicationProperties properties;
-	private ServerSocket serverSocket;
-	private RequestProcessor requestProcessor;
-	private int timeoutInMilliSeconds;
+	private record ControllerDetails(String method, String path, boolean isRegex, Controller controller)
+	{}
 
-	Server()
+	protected final ServerProperties properties;
+	private final List<ControllerDetails> controllerList;
+	private final Logger logger;
+	protected ServerSocket serverSocket;
+
+	Server(ServerProperties properties)
 	{
-		this.properties = ApplicationProperties.getInstance();
-		this.serverSocket = null;
-		this.requestProcessor = new RequestProcessor();
-		this.timeoutInMilliSeconds = properties.serverTimeout();
+		this.properties = properties;
+		this.controllerList = new ArrayList<>();
+		this.logger = Logger.getInstance(properties);
 	}
 
-	void setServerSocket(ServerSocket serverSocket)
+	public void addController(String method, String path, Controller controller)
 	{
-		this.serverSocket = serverSocket;
+		addController(method, path, false, controller);
 	}
 
-	/**
-	 * Setter method to set the name of the server. This name is returned within the http response header.
-	 * @param serverName The name of the server
-	 * @return The reference of the current object for chaining.
-	 */
-	public Server setServerName(String serverName)
+	public void addController(String method, String path, boolean isRegex, Controller controller)
 	{
-		properties.setServerName(serverName);
-		return this;
-	}
-
-	/**
-	 * Setter method to set the desired log file name.
-	 * @param fileName The name of the log file.
-	 * @return The reference of the current object for chaining.
-	 */
-	public Server setLogFileName(String fileName)
-	{
-		properties.setLogFileName(fileName);
-		return this;
-	}
-
-	/**
-	 * Setter method to tell whether the response body is to be written in the log file or not.
-	 * @param flag True means to log the response body.
-	 * @return The reference of the current object for chaining.
-	 */
-	public Server logResponse(boolean flag)
-	{
-		properties.setLogResponse(flag);
-		return this;
-	}
-
-	/**
-	 * Setter method to set the RequestProcessor for the server.
-	 * @param requestProcessor The instance of the RequestProcessor to use to process client request.
-	 * @return The reference of the current object for chaining.
-	 */
-	public Server setRequestProcessor(RequestProcessor requestProcessor)
-	{
-		if (requestProcessor != null)
+		if (controller != null)
 		{
-			this.requestProcessor = requestProcessor;
+			this.controllerList.add(new ControllerDetails(method.toUpperCase(), path, isRegex, controller));
 		}
-		return this;
 	}
 
-	/**
-	 * Setter method to set the time to wait data to read from socket before closing.
-	 * @param duration Duration to wait before closing the socket connection while waiting for data to be read from socket.
-	 * @return The reference of the current object for chaining.
-	 */
-	public Server setTimeout(Duration duration)
-	{
-		this.timeoutInMilliSeconds = (int) duration.toMillis();
-		return this;
-	}
-
-	/**
-	 * Start the server and start listening to new connection from clients.
-	 */
 	public void start()
 	{
-		new Thread(() -> {
-			try
-			{
-				while (serverSocket != null)
+		if (serverSocket != null)
+		{
+			new Thread(() -> {
+				logger.info("Server started at port: " + properties.getPort());
+				logger.debug("Host: " + properties.getHost());
+				logger.debug("Port: " + properties.getPort());
+				logger.debug("Keystore file name: " + properties.getKeyStoreFileName());
+				logger.debug("Keystore file password: " + properties.getKeyStorePassword());
+				try
 				{
-					Socket socket = serverSocket.accept();
-					new Thread(() -> handleRequest(socket)).start();
+					while (true)
+					{
+						Socket socket = serverSocket.accept();
+						new Thread(() -> {
+							try
+							{
+								handleRequest(socket);
+							}
+							catch (IOException ignore)
+							{
+								try
+								{
+									socket.close();
+								}
+								catch (IOException ignore2) {}
+							}
+						}).start();
+					}
 				}
-			}
-			catch (IOException e)
-			{
-				Log.getInstance().debug(e);
-				stop();
-			}
-		}).start();
+				catch (IOException ignore) {}
+				logger.info("Server Stopped!!!");
+			}).start();
+		}
 	}
 
-	private void handleRequest(Socket socket)
+	/**
+	 * Stop the server to listen
+	 */
+	public void stop()
 	{
-		try
+		if (serverSocket != null)
 		{
-			// setting some string values
-			String LINE_SEPARATOR = "\r\n";
-			String CONTENT_LENGTH = "Content-Length";
-			String CONNECTION = "Connection";
-			String CONNECTION_CLOSE = "close";
-
-			socket.setSoTimeout(timeoutInMilliSeconds);
-			InputStream is = socket.getInputStream();
-			OutputStream os = socket.getOutputStream();
-
-			// keeping the connection open until the connection is closed by the client
-			do
-			{
-				// reading the request line
-				String method = readInputStream(is, ' ').toUpperCase();
-				String url = readInputStream(is, ' ');
-				readInputStream(is, '\n'); // reading the HTTP version
-
-				// reading the request headers
-				Map<String, String> requestHeaders = new HashMap<>();
-				do
-				{
-					String header = readInputStream(is, '\n');
-					if (header.equals(""))
-					{
-						break;
-					}
-					else
-					{
-						int colonIndex = header.indexOf(':');
-						String key = header.substring(0, colonIndex).trim();
-						String value = header.substring(colonIndex + 1).trim();
-						requestHeaders.put(key, value);
-					}
-				} while (true);
-
-				// reading the request body
-				byte[] requestBody;
-				int bytesRead = 0;
-				String contentLength = requestHeaders.get(CONTENT_LENGTH);
-				if (contentLength != null)
-				{
-					int requestContentLength = Integer.parseInt(contentLength);
-					requestBody = new byte[requestContentLength];
-					do
-					{
-						int currentBytesRead =  is.read(requestBody, bytesRead, requestContentLength);
-						bytesRead += currentBytesRead;
-					} while (bytesRead < requestContentLength);
-				}
-				else
-				{
-					requestBody = new byte[0];
-				}
-
-				// extracting the path, request parameters and reference
-				Pattern urlPattern = Pattern.compile("(/[^?#]*)([?]([^#]*))?(#(.*))?");
-				Matcher urlMatcher = urlPattern.matcher(url);
-				String path, parametersString, anchor;
-				if (urlMatcher.find())
-				{
-					path = urlMatcher.group(1);
-					parametersString = urlMatcher.group(3);
-					anchor = urlMatcher.group(5);
-				}
-				else
-				{
-					path = "/";
-					parametersString = null;
-					anchor = null;
-				}
-
-
-				Map<String, String> requestParameters = new HashMap<>();
-				if (parametersString != null && parametersString.length() != 0)
-				{
-					for (String parameter : parametersString.split("&"))
-					{
-						String[] keyValue = parameter.split("=");
-						if (keyValue.length >= 2)
-						{
-							requestParameters.put(URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8), URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8));
-						}
-					}
-				}
-
-				// generating the response
-				Request request = new Request(socket.getInetAddress().getHostAddress(), method, path, requestParameters, anchor, requestHeaders, Arrays.copyOfRange(requestBody, 0, bytesRead));
-				Log.getInstance().debug(request);
-				Response response = requestProcessor.process(request);
-				Log.getInstance().debug(response);
-
-				// sending the response status
-				os.write((properties.httpVersion() + " " + response.statusCode() + " " + response.statusText() + LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8));
-
-				// sending the headers
-				Map<String, String> responseHeaders = response.headers();
-				responseHeaders.put("Date", properties.timestampForResponse());
-				responseHeaders.put("Server", properties.serverName());
-				responseHeaders.put("Content-Length", String.valueOf(response.body().length));
-				for (String key : responseHeaders.keySet())
-				{
-					if (key != null)
-					{
-						String value = responseHeaders.get(key);
-						if (value != null)
-						{
-							String line = key + ": " + value + LINE_SEPARATOR;
-							os.write(line.getBytes(StandardCharsets.UTF_8));
-						}
-					}
-				}
-				os.write(LINE_SEPARATOR.getBytes(StandardCharsets.UTF_8));
-
-				// sending the body
-				os.write(response.body());
-
-				// checking the condition
-				String connection = requestHeaders.get(CONNECTION);
-				if (connection != null && connection.equals(CONNECTION_CLOSE))
-				{
-					break;
-				}
-			} while (true);
-			socket.close();
-		}
-		catch (Exception e)
-		{
-			Log.getInstance().debug(e);
 			try
 			{
-				socket.close();
+				this.serverSocket.close();
 			}
-			catch (IOException ex)
-			{
-				Log.getInstance().error(ex);
-			}
+			catch (IOException ignore) {}
+			this.serverSocket = null;
 		}
+		logger.stop();
 	}
 
 	private String readInputStream(InputStream is, char endChar) throws IOException
@@ -281,24 +120,165 @@ public class Server
 		return temp.toString().trim();
 	}
 
-	/**
-	 * Stop the server to listen
-	 */
-	public void stop()
+	private void readRequestLine(InputStream is, Request request) throws IOException
 	{
-		if (serverSocket != null)
+		request.setMethod(readInputStream(is, ' '));
+		Matcher urlMatcher = Pattern.compile("(/[^?#]*)([?]([^#]*))?(#(.*))?").matcher(readInputStream(is, ' '));
+		request.setHttpVersion(readInputStream(is, '\n')); // reading and ignoring the HTTP version
+
+		// extracting the path, request parameters and reference
+		if (urlMatcher.find())
 		{
-			try
-			{
-				serverSocket.close();
-				Log.getInstance().info("Server stopped!");
-			}
-			catch (IOException e)
-			{
-				Log.getInstance().error(e);
-			}
-			serverSocket = null;
+			request.setPath(urlMatcher.group(1));
+			request.setParameters(urlMatcher.group(3));
 		}
-		Log.getInstance().stop();
+	}
+
+	private void readRequestHeaders(InputStream is, Request request) throws IOException
+	{
+		do
+		{
+			String header = readInputStream(is, '\n');
+			if (header.isEmpty())
+			{
+				break;
+			}
+			else
+			{
+				String[] keyValue = header.split(":");
+				if (keyValue.length == 1)
+				{
+					request.addHeader(keyValue[0], "");
+				}
+				else if (keyValue.length == 2)
+				{
+					request.addHeader(keyValue[0], keyValue[1].substring(1));
+				}
+			}
+		} while (true);
+	}
+
+	private void readRequestBody(InputStream is, Request request) throws IOException
+	{
+		String contentLength = request.getHeaders().get("Content-Length");
+		if (contentLength != null)
+		{
+			int requestContentLength = Integer.parseInt(contentLength);
+			byte[] requestBody = new byte[requestContentLength];
+			int totalBytesRead = 0;
+			do
+			{
+				int currentBytesRead = is.read(requestBody, totalBytesRead, requestContentLength);
+				totalBytesRead += currentBytesRead;
+			} while (totalBytesRead < requestContentLength);
+			request.setBody(requestBody);
+		}
+	}
+
+	private Response generateResponse(Request request)
+	{
+		// finding the correct controller object
+		Controller controller = new ControllerFile(properties);
+		for (ControllerDetails controllerDetails : controllerList)
+		{
+			if (request.getMethod().equals(controllerDetails.method()))
+			{
+				if (controllerDetails.isRegex() && request.getPath().matches(controllerDetails.path()))
+				{
+					controller = controllerDetails.controller();
+					break;
+				}
+				else
+				{
+					String[] actualPaths = request.getPath().substring(1).split("/");
+					String[] expectedPaths = controllerDetails.path().substring(1).split("/");
+					if (actualPaths.length == expectedPaths.length)
+					{
+						boolean pathMatched = true;
+						for (int i = 0; i < expectedPaths.length; i++)
+						{
+							if (expectedPaths[i].startsWith("{") && expectedPaths[i].endsWith("}"))
+							{
+								request.addPathParameters(expectedPaths[i].substring(1, expectedPaths[i].length()-1), actualPaths[i]);
+							}
+							else
+							{
+								pathMatched = pathMatched && (expectedPaths[i].equals(actualPaths[i]));
+							}
+						}
+						if (pathMatched)
+						{
+							controller = controllerDetails.controller();
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// calling the process method of the controller object
+		Response response;
+		try
+		{
+			response = controller.process(request);
+			if (response == null)
+			{
+				response = new Response(404);
+			}
+		}
+		catch (Exception e)
+		{
+			response = new Response(500);
+		}
+
+		return response;
+	}
+
+	private void writeResponse(OutputStream os, Response response) throws IOException
+	{
+		// writing the response status
+		os.write((properties.getHttpVersion() + " " + response.statusCode() + " " + response.statusText() + "\r\n").getBytes(StandardCharsets.UTF_8));
+
+		// writing the headers
+		os.write(("Date: " + properties.getResponseDateFormat().format(new Date()) + "\r\n").getBytes(StandardCharsets.UTF_8));
+		os.write(("Server: " + properties.getServerName() + "\r\n").getBytes(StandardCharsets.UTF_8));
+		os.write(("Content-Length: " + response.body().length + "\r\n").getBytes(StandardCharsets.UTF_8));
+		for (Map.Entry<String, String> header : response.headers().entrySet())
+		{
+			String line = header.getKey() + ": " + header.getValue() + "\r\n";
+			os.write(line.getBytes(StandardCharsets.UTF_8));
+		}
+		os.write("\r\n".getBytes(StandardCharsets.UTF_8));
+
+		// writing the body
+		os.write(response.body());
+	}
+
+	private void handleRequest(Socket socket) throws IOException
+	{
+		socket.setSoTimeout(properties.getServerTimeoutInMillis());
+		InputStream is = socket.getInputStream();
+		OutputStream os = socket.getOutputStream();
+
+		// keeping the connection open until the connection is closed by the client
+		while (true)
+		{
+			Request request = new Request(socket.getInetAddress().getHostAddress());
+			readRequestLine(is, request);
+			readRequestHeaders(is, request);
+			readRequestBody(is, request);
+			logger.info(request.getIp() + " " + request.getMethod() + " " + request.getPath());
+			logger.debug(request.getHeaders());
+
+			writeResponse(os, generateResponse(request));
+
+			// checking the condition
+			String connection = request.getHeaders().get("Connection");
+			if (connection != null && connection.equals("close"))
+			{
+				break;
+			}
+		}
+		socket.close();
 	}
 }

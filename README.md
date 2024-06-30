@@ -6,8 +6,8 @@ This is a http server program which can be used with another program that requir
 
 [![Project License](https://img.shields.io/github/license/ParthaPPM/http-server)](https://github.com/ParthaPPM/http-server/blob/master/LICENSE)
 [![javadoc](https://javadoc.io/badge2/io.github.parthappm/http-server/javadoc.svg)](https://javadoc.io/doc/io.github.parthappm/http-server)
-[![POM](https://img.shields.io/maven-central/v/io.github.parthappm/http-server)](https://central.sonatype.dev/artifact/io.github.parthappm/http-server/1.0.1)
-[![Artifact JAR](https://javadoc.io/badge2/io.github.parthappm/http-server/JAR.svg)](https://repo1.maven.org/maven2/io/github/parthappm/http-server/1.0.1/http-server-1.0.1.jar)
+[![POM](https://img.shields.io/maven-central/v/io.github.parthappm/http-server)](https://central.sonatype.dev/artifact/io.github.parthappm/http-server/2.0.0)
+[![Artifact JAR](https://javadoc.io/badge2/io.github.parthappm/http-server/JAR.svg)](https://repo1.maven.org/maven2/io/github/parthappm/http-server/2.0.0/http-server-2.0.0.jar)
 
 ## How to use:-
 

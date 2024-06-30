@@ -9,35 +9,21 @@ import java.net.ServerSocket;
  */
 public class HttpServer extends Server
 {
-	private final int port;
-	private final String host;
-
 	/**
-	 * Creates an instance of HttpServer class which listens to port 80 by default.
+	 * Creates an instance of HttpServer class with default properties.
 	 */
 	public HttpServer()
 	{
-		this(ApplicationProperties.getInstance().httpPort());
+		this(new ServerProperties());
 	}
 
 	/**
-	 * Creates an instance of HttpServer class which listens to the port specified.
-	 * @param port The server listens to this port.
+	 * Creates an instance of HttpServer class with custom properties.
+	 * @param properties The custom properties
 	 */
-	public HttpServer(int port)
+	public HttpServer(ServerProperties properties)
 	{
-		this(port, null);
-	}
-
-	/**
-	 * Creates an instance of HttpServer class which listens to the port specified and accepts connection only from the host specified.
-	 * @param port The server listens to this port.
-	 * @param host The server accepts connection only from this host.
-	 */
-	public HttpServer(int port, String host)
-	{
-		this.port = port;
-		this.host = host;
+		super(properties);
 	}
 
 	/**
@@ -45,16 +31,13 @@ public class HttpServer extends Server
 	 */
 	public void start()
 	{
-		Log.getInstance().debug("Port: " + port);
-		Log.getInstance().debug("Host: " + host);
 		try
 		{
-			setServerSocket(new ServerSocket(port, 0, host == null ? null : InetAddress.getByName(host)));
-			Log.getInstance().info("Server started at port: " + port);
+			serverSocket = new ServerSocket(properties.getPort(), 0, properties.getHost() == null ? null : InetAddress.getByName(properties.getHost()));
 		}
 		catch (IOException e)
 		{
-			Log.getInstance().error(e);
+			System.out.println("Could not create server socket!!!");
 		}
 		super.start();
 	}
