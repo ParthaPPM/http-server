@@ -79,33 +79,34 @@ class Logger
 			try
 			{
 				LogItem logItem = logQueue.take();
-				switch (logItem.type)
+				if (logItem.type == LogType.INFO)
 				{
-					case INFO:
-					{
-						String logText = logDateFormat.format(logItem.date()) + " [INFO] " + getLogMessage(logItem.message);
-						System.out.println(logText);
-						writeToFile(logText);
-						break;
-					}
-					case DEBUG:
-					{
-						String logText = logDateFormat.format(logItem.date()) + " [DEBUG] " + getLogMessage(logItem.message);
-						writeToFile(logText);
-						break;
-					}
-					case ERROR:
-					{
-						String logText = logDateFormat.format(logItem.date()) + " [ERROR] " + getLogMessage(logItem.message);
-						System.out.println(logText);
-						writeToFile(logText);
-						break;
-					}
+					String logText = logDateFormat.format(logItem.date()) + " [INFO] " + getLogMessage(logItem.message);
+					System.out.println(logText);
+					writeToFile(logText);
 				}
-				// breaking the while loop if the LOG type is STOP
-				if (logItem.type == LogType.STOP)
+				else if (logItem.type == LogType.DEBUG)
 				{
-					break;
+					String logText = logDateFormat.format(logItem.date()) + " [DEBUG] " + getLogMessage(logItem.message);
+					writeToFile(logText);
+				}
+				else if (logItem.type == LogType.ERROR)
+				{
+					String logText = logDateFormat.format(logItem.date()) + " [ERROR] " + getLogMessage(logItem.message);
+					System.out.println(logText);
+					writeToFile(logText);
+				}
+				else if (logItem.type == LogType.STOP)
+				{
+					String logText = logDateFormat.format(logItem.date()) + " [STOP] " + getLogMessage(logItem.message);
+					System.out.println(logText);
+					writeToFile(logText);
+					break; // breaking the while loop if the LOG type is STOP
+				}
+				else
+				{
+					String logText = logDateFormat.format(logItem.date()) + " [UNKNOWN] " + getLogMessage(logItem.message);
+					writeToFile(logText);
 				}
 			}
 			catch (InterruptedException ignore) {}
@@ -148,6 +149,6 @@ class Logger
 
 	void stop()
 	{
-		createLogEntry(LogType.STOP, null);
+		createLogEntry(LogType.STOP, "Server Stopped !!!");
 	}
 }

@@ -79,7 +79,7 @@ public class Server
 					}
 				}
 				catch (IOException ignore) {}
-				logger.info("Server Stopped!!!");
+				logger.stop();
 			}).start();
 		}
 	}
@@ -98,7 +98,6 @@ public class Server
 			catch (IOException ignore) {}
 			this.serverSocket = null;
 		}
-		logger.stop();
 	}
 
 	private String readInputStream(InputStream is, char endChar) throws IOException
