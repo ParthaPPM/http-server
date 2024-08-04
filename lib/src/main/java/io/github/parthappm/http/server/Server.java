@@ -78,7 +78,10 @@ public class Server
 						}).start();
 					}
 				}
-				catch (IOException ignore) {}
+				catch (IOException e)
+				{
+					logger.error(e);
+				}
 				logger.stop();
 			}).start();
 		}
@@ -95,7 +98,10 @@ public class Server
 			{
 				this.serverSocket.close();
 			}
-			catch (IOException ignore) {}
+			catch (IOException e)
+			{
+				logger.error(e);
+			}
 			this.serverSocket = null;
 		}
 	}
@@ -216,21 +222,20 @@ public class Server
 		}
 
 		// calling the process method of the controller object
-		Response response;
 		try
 		{
-			response = controller.process(request);
+			Response response = controller.process(request);
 			if (response == null)
 			{
-				response = new Response(404);
+				throw new NullPointerException("Response object is null.");
 			}
+			return response;
 		}
 		catch (Exception e)
 		{
-			response = new Response(500);
+			logger.error(e);
+			return new Response(500);
 		}
-
-		return response;
 	}
 
 	private void writeResponse(OutputStream os, Response response) throws IOException
@@ -267,6 +272,7 @@ public class Server
 			readRequestHeaders(is, request);
 			readRequestBody(is, request);
 			logger.info(request.getIp() + " " + request.getMethod() + " " + request.getPath());
+			logger.debug("Request Headers:");
 			logger.debug(request.getHeaders());
 
 			writeResponse(os, generateResponse(request));
