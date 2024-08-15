@@ -92,18 +92,19 @@ public class Server
 	 */
 	public void stop()
 	{
-		if (serverSocket != null)
+		try
 		{
-			try
-			{
-				this.serverSocket.close();
-			}
-			catch (IOException e)
-			{
-				logger.error(e);
-			}
-			this.serverSocket = null;
+			this.serverSocket.close();
 		}
+		catch (IOException | NullPointerException e)
+		{
+			logger.error(e);
+		}
+		finally
+		{
+			logger.stop();
+		}
+		this.serverSocket = null;
 	}
 
 	private String readInputStream(InputStream is, char endChar) throws IOException

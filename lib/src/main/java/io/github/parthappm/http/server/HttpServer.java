@@ -1,6 +1,5 @@
 package io.github.parthappm.http.server;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 
@@ -35,7 +34,7 @@ public class HttpServer extends Server
 		{
 			serverSocket = new ServerSocket(properties.getPort(), 0, properties.getHost() == null ? null : InetAddress.getByName(properties.getHost()));
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			System.out.println("Could not create server socket!!!");
 		}

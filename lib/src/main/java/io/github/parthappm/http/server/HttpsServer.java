@@ -2,7 +2,6 @@ package io.github.parthappm.http.server;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
-import java.io.IOException;
 import java.net.InetAddress;
 
 /**
@@ -33,14 +32,14 @@ public class HttpsServer extends Server
 	 */
 	public void start()
 	{
-		System.setProperty("javax.net.ssl.keyStore", properties.getKeyStoreFileName());
-		System.setProperty("javax.net.ssl.keyStorePassword", properties.getKeyStorePassword());
-		ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
 		try
 		{
+			System.setProperty("javax.net.ssl.keyStore", properties.getKeyStoreFileName());
+			System.setProperty("javax.net.ssl.keyStorePassword", properties.getKeyStorePassword());
+			ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
 			serverSocket = socketFactory.createServerSocket(properties.getPort(), 0, properties.getHost() == null ? null : InetAddress.getByName(properties.getHost()));
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			System.out.println("Could not create server socket!!!");
 		}

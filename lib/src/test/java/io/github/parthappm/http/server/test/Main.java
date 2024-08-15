@@ -13,8 +13,8 @@ public class Main
 		ServerProperties serverProperties = new ServerProperties();
 		serverProperties.setPort(8080);
 		serverProperties.setHost("127.0.0.1");
-		serverProperties.setKeyStoreFileName("file name"); //TODO test this later
-		serverProperties.setKeyStorePassword("password"); //TODO test this later
+		serverProperties.setKeyStoreFileName("file name");
+		serverProperties.setKeyStorePassword("password");
 		serverProperties.setServerTimeoutInMillis(10000);
 		serverProperties.setServerName("Test Server");
 		serverProperties.setRootDirectory("");
@@ -22,9 +22,9 @@ public class Main
 		serverProperties.setLogDateFormat("[HH:mm:ss]");
 
 		Server httpServer = new HttpServer(serverProperties);
-		httpServer.addController("get", "/index.html", request -> new Response("Page found"));
+		httpServer.addController("get", "/index.html", request -> new Response().setBody("This is index page"));
 		Server httpsServer = new HttpsServer(serverProperties);
-		httpsServer.addController("get", "/index.html", request -> new Response("Page not found"));
+		httpsServer.addController("get", "/index.html", request -> new Response().setBody("This is also index page"));
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		boolean continueExecution = true;

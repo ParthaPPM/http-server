@@ -97,7 +97,10 @@ public class ServerProperties
 
 	public void setServerName(String serverName)
 	{
-		this.serverName = serverName;
+		if (serverName != null && !serverName.isEmpty())
+		{
+			this.serverName = serverName;
+		}
 	}
 
 	public String getServerName()
