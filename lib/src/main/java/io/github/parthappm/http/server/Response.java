@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An instance of this class is to be created and returned from the methods of the RequestProcessor class.
+ * An instance of this class is to be returned from the process method of Controller interface.
+ * An object of this class contains all the details that are to be returned to the client for a single HTTP request.
  */
 public class Response
 {
@@ -89,13 +90,16 @@ public class Response
 		responseMetadataMap.put(511, new ResponseMetadata("Network Authentication Required", "Network access requires authentication. Please log in.", "🔐"));
 	}
 
+	/**
+	 * Creates a Response object with 200 status code and default response body.
+	 */
 	public Response()
 	{
 		this(200);
 	}
 
 	/**
-	 * Creates a Response object with specified status code and empty body.
+	 * Creates a Response object with specified status code and default response body.
 	 * @param statusCode The HTTP status code.
 	 */
 	public Response(int statusCode)
@@ -123,6 +127,7 @@ public class Response
 
 	/**
 	 * Setter method to add or modify a single HTTP header.
+	 * If a header is to be deleted, then call this method with the header name (key) and value as null.
 	 * @param key The header name.
 	 * @param value The header value.
 	 * @return The reference of the current object for chaining.
@@ -149,7 +154,7 @@ public class Response
 
 	/**
 	 * Setter method to set the HTTP response body.
-	 * @param responseObject The HTTP response body in String.
+	 * @param responseObject The HTTP response body. Can be Bytes Array, String or any Java Object.
 	 * @return The reference of the current object for chaining.
 	 */
 	public Response setBody(Object responseObject)

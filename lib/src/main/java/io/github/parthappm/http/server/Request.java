@@ -31,11 +31,19 @@ public class Request
 		this.body = new byte[0];
 	}
 
+	/**
+	 * Returns the IP Address of the client making the request.
+	 * @return IP Address.
+	 */
 	public String getIp()
 	{
 		return ip;
 	}
 
+	/**
+	 * Returns the HTTP request method: GET, POST, etc.
+	 * @return HTTP request method.
+	 */
 	public String getMethod()
 	{
 		return method;
@@ -46,6 +54,10 @@ public class Request
 		this.method = method.toUpperCase();
 	}
 
+	/**
+	 * Returns the path or context of the HTTP request. The part after the host in the url. If no path is present in the url, then "/" is returned.
+	 * @return HTTP request path or context.
+	 */
 	public String getPath()
 	{
 		return path;
@@ -56,6 +68,10 @@ public class Request
 		this.path = path;
 	}
 
+	/**
+	 * Returns the HTTP request version. E.g.: HTTP/1.1
+	 * @return The HTTP request version.
+	 */
 	public String getHttpVersion()
 	{
 		return httpVersion;
@@ -66,6 +82,10 @@ public class Request
 		this.httpVersion = httpVersion;
 	}
 
+	/**
+	 * Returns Map object containing all the path parameters present in the URL as configured in the controller.
+	 * @return Map of String to String.
+	 */
 	public Map<String, String> getPathParameters()
 	{
 		return pathParameters;
@@ -76,6 +96,10 @@ public class Request
 		this.pathParameters.put(key, value);
 	}
 
+	/**
+	 * Returns Map object containing all the query parameters present in the URL after the path or context.
+	 * @return Map of String to String.
+	 */
 	public Map<String, String> getParameters()
 	{
 		return parameters;
@@ -100,6 +124,10 @@ public class Request
 		}
 	}
 
+	/**
+	 * Returns Map of object containing all the HTTP request headers.
+	 * @return Map of String to String.
+	 */
 	public Map<String, String> getHeaders()
 	{
 		return headers;
@@ -110,6 +138,10 @@ public class Request
 		this.headers.put(key, value);
 	}
 
+	/**
+	 * Returns HTTP request body. If request body is not present then this method returns an array of length zero.
+	 * @return Bytes array.
+	 */
 	public byte[] getBody()
 	{
 		return body;

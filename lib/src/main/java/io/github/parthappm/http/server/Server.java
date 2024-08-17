@@ -22,10 +22,10 @@ public class Server
 	private record ControllerDetails(String method, String path, boolean isRegex, Controller controller)
 	{}
 
-	protected final ServerProperties properties;
+	final ServerProperties properties;
 	private final List<ControllerDetails> controllerList;
 	private final Logger logger;
-	protected ServerSocket serverSocket;
+	ServerSocket serverSocket;
 
 	Server(ServerProperties properties)
 	{
@@ -34,11 +34,26 @@ public class Server
 		this.logger = Logger.getInstance(properties);
 	}
 
+	/**
+	 * Adds a mapping of a controller.
+	 * The path string may contain path parameters enclosed in curly braces e.g. /product/{id}/details.
+	 * @param method HTTP request method.
+	 * @param path HTTP request path (or context).
+	 * @param controller Object of class implementing Controller interface.
+	 */
 	public void addController(String method, String path, Controller controller)
 	{
 		addController(method, path, false, controller);
 	}
 
+	/**
+	 * Adds a mapping of a controller.
+	 * The path string may contain path parameters enclosed in curly braces e.g. /product/{id}/details.
+	 * @param method HTTP request method.
+	 * @param path HTTP request path (or context).
+	 * @param isRegex Boolean value representing whether the path is a regular expressing matching the request path.
+	 * @param controller Object of class implementing Controller interface.
+	 */
 	public void addController(String method, String path, boolean isRegex, Controller controller)
 	{
 		if (controller != null)
@@ -47,6 +62,9 @@ public class Server
 		}
 	}
 
+	/**
+	 * Starts the server to listen to the defined port in ServerProperties object
+	 */
 	public void start()
 	{
 		if (serverSocket != null)

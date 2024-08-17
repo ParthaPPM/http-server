@@ -20,7 +20,7 @@ public class HttpsServer extends Server
 
 	/**
 	 * Creates an instance of HttpsServer class with custom properties.
-	 * @param properties The custom properties
+	 * @param properties An instance of ServerProperties class.
 	 */
 	public HttpsServer(ServerProperties properties)
 	{

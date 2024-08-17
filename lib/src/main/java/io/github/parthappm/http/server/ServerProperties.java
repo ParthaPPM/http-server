@@ -21,7 +21,7 @@ public class ServerProperties
 	private final SimpleDateFormat responseDateFormat;
 
 	/**
-	 * Creates an instance of ServerProperties class which listens to port 443 by default.
+	 * Creates a ServerProperties object with default settings.
 	 */
 	public ServerProperties()
 	{
@@ -40,61 +40,112 @@ public class ServerProperties
 		this.responseDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
+	/**
+	 * Sets the HTTP/HTTPS port in which the server will server.
+	 * By default, 80 of HTTP and 443 for HTTPS.
+	 * @param port HTTP/HTTPS port.
+	 */
 	public void setPort(int port)
 	{
 		this.port = port;
 	}
 
+	/**
+	 * Returns the HTTP/HTTPS port.
+	 * @return HTTP/HTTPS port.
+	 */
 	public int getPort()
 	{
 		return port;
 	}
 
+	/**
+	 * Sets the host of the server. If the server machine is connected to more than one network, this host identified in which network to serve.
+	 * By default, it is null, which means the server can serve request from any client from any network.
+	 * @param host Host name.
+	 */
 	public void setHost(String host)
 	{
 		this.host = host;
 	}
 
+	/**
+	 * Returns the host name.
+	 * @return Host name.
+	 */
 	public String getHost()
 	{
 		return host;
 	}
 
+	/**
+	 * Sets the KeyStore (.jks) file required for HTTPS server.
+	 * @param keyStoreFileName KeyStore file name with absolute or relative path.
+	 */
 	public void setKeyStoreFileName(String keyStoreFileName)
 	{
 		this.keyStoreFileName = keyStoreFileName;
 	}
 
+	/**
+	 * Returns the KeyStore(.jks) file name.
+	 * @return KeyStore file name with absolute or relative path.
+	 */
 	public String getKeyStoreFileName()
 	{
 		return keyStoreFileName;
 	}
 
+	/**
+	 * Sets the password of the KeyStore file. This password was set while creating the KeyStore file.
+	 * @param keyStorePassword Password of the KeyStore file.
+	 */
 	public void setKeyStorePassword(String keyStorePassword)
 	{
 		this.keyStorePassword = keyStorePassword;
 	}
 
+	/**
+	 * Returns the password of the KeyStore file.
+	 * @return Password of KeyStore file.
+	 */
 	public String getKeyStorePassword()
 	{
 		return keyStorePassword;
 	}
 
+	/**
+	 * Sets the server timeout. By default, timeout is 30 seconds i.e. 30000 milliseconds.
+	 * @param serverTimeoutInMillis Time in milliseconds.
+	 */
 	public void setServerTimeoutInMillis(int serverTimeoutInMillis)
 	{
 		this.serverTimeoutInMillis = serverTimeoutInMillis;
 	}
 
+	/**
+	 * Returns the server timeout in milliseconds.
+	 * @return Time in milliseconds.
+	 */
 	public int getServerTimeoutInMillis()
 	{
 		return serverTimeoutInMillis;
 	}
 
+	/**
+	 * Returns the HTTP version. E.g: HTTP/1.1
+	 * @return HTTP version.
+	 */
 	public String getHttpVersion()
 	{
 		return httpVersion;
 	}
 
+	/**
+	 * Sets the Server Name that will be sent in the HTTP response headers.
+	 * The server name can be anything. This helps the client to identify which server has server the response. By default, the server name is "Nebula".
+	 * @param serverName HTTP server name.
+	 */
 	public void setServerName(String serverName)
 	{
 		if (serverName != null && !serverName.isEmpty())
@@ -103,41 +154,75 @@ public class ServerProperties
 		}
 	}
 
+	/**
+	 * Returns the HTTP server name.
+	 * @return HTTP server name.
+	 */
 	public String getServerName()
 	{
 		return serverName;
 	}
 
+	/**
+	 * Sets the default directory from which the HTTP files will be servers.
+	 * By default, root directory is null which means no files will be served from any location.
+	 * @param rootDirectory Path to directory from where files will be served.
+	 */
 	public void setRootDirectory(String rootDirectory)
 	{
 		this.rootDirectory = rootDirectory;
 	}
 
+	/**
+	 * Returns the default directory from which the HTTP files will be served.
+	 * @return Path to directory from where file will be served.
+	 */
 	public String getRootDirectory()
 	{
 		return rootDirectory;
 	}
 
+	/**
+	 * Sets the Log file name where all the logs will be dumped. This can be helpful in debugging.
+	 * By default, the file name is null, which means no log file is created.
+	 * @param fileName Log file name.
+	 */
 	public void setLogFileName(String fileName)
 	{
 		this.logFileName = fileName;
 	}
 
+	/**
+	 * Returns the Log file name.
+	 * @return Log file name.
+	 */
 	public String getLogFileName()
 	{
 		return logFileName;
 	}
 
+	/**
+	 * Sets the date format string pattern to be used for logging in console or in log file.
+	 * @param logDateFormat String pattern that will be parsed by SimpleDateFormat class.
+	 */
 	public void setLogDateFormat(String logDateFormat)
 	{
 		this.logDateFormat = new SimpleDateFormat(logDateFormat);
 	}
 
+	/**
+	 * Returns the instance of SimpleDateFormat class that is used to format date for logging.
+	 * @return SimpleDateFormat object
+	 */
 	SimpleDateFormat getLogDateFormat()
 	{
 		return logDateFormat;
 	}
 
+	/**
+	 * Returns the instance of SimpleDateFormat class that is used to format date for returning in the HTTP response header
+	 * @return SimpleDateFormat object
+	 */
 	SimpleDateFormat getResponseDateFormat()
 	{
 		return responseDateFormat;
