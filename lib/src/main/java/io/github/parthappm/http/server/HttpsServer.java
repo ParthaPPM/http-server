@@ -39,6 +39,16 @@ public class HttpsServer extends Server
 			ServerSocketFactory socketFactory = SSLServerSocketFactory.getDefault();
 			serverSocket = socketFactory.createServerSocket(properties.getPort(), 0, properties.getHost() == null ? null : InetAddress.getByName(properties.getHost()));
 		}
+		catch (SecurityException e)
+		{
+			logger.error("Cannot set properties: javax.net.ssl.keyStore or javax.net.ssl.keyStorePassword");
+			logger.error(e);
+		}
+		catch (NullPointerException e)
+		{
+			logger.error("Either KeyStore file name or KeyStore password is null");
+			logger.error(e);
+		}
 		catch (Exception e)
 		{
 			logger.error(e);
