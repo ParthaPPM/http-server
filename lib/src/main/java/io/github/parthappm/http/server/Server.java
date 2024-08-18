@@ -24,7 +24,7 @@ public class Server
 
 	final ServerProperties properties;
 	private final List<ControllerDetails> controllerList;
-	private final Logger logger;
+	final Logger logger;
 	ServerSocket serverSocket;
 
 	Server(ServerProperties properties)
@@ -85,23 +85,27 @@ public class Server
 							{
 								handleRequest(socket);
 							}
-							catch (IOException ignore)
+							catch (Exception ignore)
 							{
 								try
 								{
 									socket.close();
 								}
-								catch (IOException ignore2) {}
+								catch (Exception ignore2) {}
 							}
 						}).start();
 					}
 				}
-				catch (IOException e)
+				catch (Exception e)
 				{
 					logger.error(e);
 				}
-				logger.stop();
+				stop();
 			}).start();
+		}
+		else
+		{
+			stop();
 		}
 	}
 
@@ -110,19 +114,19 @@ public class Server
 	 */
 	public void stop()
 	{
-		try
+		if (serverSocket != null)
 		{
-			this.serverSocket.close();
+			try
+			{
+				serverSocket.close();
+			}
+			catch (Exception e)
+			{
+				logger.error(e);
+			}
+			serverSocket = null;
 		}
-		catch (IOException | NullPointerException e)
-		{
-			logger.error(e);
-		}
-		finally
-		{
-			logger.stop();
-		}
-		this.serverSocket = null;
+		logger.stop();
 	}
 
 	private String readInputStream(InputStream is, char endChar) throws IOException

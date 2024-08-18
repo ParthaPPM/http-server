@@ -36,7 +36,7 @@ public class HttpServer extends Server
 		}
 		catch (Exception e)
 		{
-			System.out.println("Could not create server socket!!!");
+			logger.error(e);
 		}
 		super.start();
 	}
