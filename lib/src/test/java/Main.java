@@ -1,5 +1,3 @@
-package io.github.parthappm.http.server.test;
-
 import io.github.parthappm.http.server.*;
 
 import java.io.BufferedReader;
