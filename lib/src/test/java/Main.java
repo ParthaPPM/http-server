@@ -21,6 +21,7 @@ public class Main
 
 		Server httpServer = new HttpServer(serverProperties);
 		httpServer.addController("get", "/index.html", request -> new Response().setBody("This is index page"));
+		httpServer.addController("GET", "/test", new TestController());
 		Server httpsServer = new HttpsServer(serverProperties);
 		httpsServer.addController("get", "/index.html", request -> new Response().setBody("This is also index page"));
 

@@ -206,7 +206,7 @@ public class Server
 	private Response generateResponse(Request request)
 	{
 		// finding the correct controller object
-		Controller controller = new ControllerFile(properties);
+		Controller controller = null;
 		for (ControllerDetails controllerDetails : controllerList)
 		{
 			if (request.getMethod().equals(controllerDetails.method()))
@@ -245,20 +245,29 @@ public class Server
 		}
 
 		// calling the process method of the controller object
+		Response response;
 		try
 		{
-			Response response = controller.process(request);
-			if (response == null)
+			Controller fileController = new ControllerFile(properties);
+			if (controller == null)
 			{
-				throw new NullPointerException("Response object is null.");
+				response = fileController.process(request);
 			}
-			return response;
+			else
+			{
+				response = controller.process(request);
+				if (response == null)
+				{
+					response = fileController.process(request);
+				}
+			}
 		}
 		catch (Exception e)
 		{
 			logger.error(e);
-			return new Response(500);
+			response = new Response(500);
 		}
+		return response;
 	}
 
 	private void writeResponse(OutputStream os, Response response) throws IOException
