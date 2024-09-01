@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class Response
 {
-	private record ResponseMetadata(String statusText, String message, String emoji)
+	private record TemplateReplaceData(String statusText, String message, String emoji)
 	{}
 
 	private final int statusCode;
@@ -19,75 +19,75 @@ public class Response
 	private final Map<String, String> headers;
 	private byte[] body;
 	private static final String responseBodyTemplate;
-	private static final Map<Integer, ResponseMetadata> responseMetadataMap;
+	private static final Map<Integer, TemplateReplaceData> templateReplaceDataMap;
 
 	static
 	{
 		responseBodyTemplate = "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>${code} ${title}</title><style>body{font-family:\"Segoe UI\",Tahoma,Geneva,Verdana,sans-serif;text-align:center;background-color:#e9ecef;margin:0;padding:0;color:#495057}.container{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}.emoji{font-size:100px;margin-bottom:20px}.code{font-size:120px;margin:0;color:#dc3545}.message{font-size:18px;margin:20px 0;color:#343a40}</style></head><body><div class=\"container\"><div class=\"emoji\">${emoji}</div><h1 class=\"code\">${code}</h1><h2 class=\"title\">${title}</h2><p class=\"message\">${message}</p></div></body></html>";
-		responseMetadataMap = new HashMap<>();
-		responseMetadataMap.put(100, new ResponseMetadata("Continue", "The server has received the request headers, and the client should proceed to send the request body.", "⏩"));
-		responseMetadataMap.put(101, new ResponseMetadata("Switching Protocol", "The server is switching protocols as requested by the client.", "🔄"));
-		responseMetadataMap.put(102, new ResponseMetadata("Processing", null, null));
-		responseMetadataMap.put(103, new ResponseMetadata("Early Hints", null, null));
-		responseMetadataMap.put(200, new ResponseMetadata("OK", "The request has succeeded. Your server is running fine.", "✅"));
-		responseMetadataMap.put(201, new ResponseMetadata("Created", "The request has succeeded, and a new resource has been created.", "🎉"));
-		responseMetadataMap.put(202, new ResponseMetadata("Accepted", "The request has been accepted for processing, but the processing has not been completed.", "⏳"));
-		responseMetadataMap.put(203, new ResponseMetadata("Non-Authoritative Information", "The request was successful but the information returned may be from a local or third-party copy.", "📝"));
-		responseMetadataMap.put(204, new ResponseMetadata("No Content", null, null));
-		responseMetadataMap.put(205, new ResponseMetadata("Reset Content", "The request was successful, and the client should reset the document view.", "🔄"));
-		responseMetadataMap.put(206, new ResponseMetadata("Partial Content", "The server is delivering only part of the resource due to a range header sent by the client.", "📄"));
-		responseMetadataMap.put(207, new ResponseMetadata("Multi-Status", "Multiple operations completed. Check individual results for details", "📋"));
-		responseMetadataMap.put(208, new ResponseMetadata("Already Reported", "This information has already been reported.", "📄"));
-		responseMetadataMap.put(226, new ResponseMetadata("IM Used", "Request fulfilled; modifications applied.", "🔧"));
-		responseMetadataMap.put(300, new ResponseMetadata("Multiple Choice", "The request has more than one possible response.", "🔀"));
-		responseMetadataMap.put(301, new ResponseMetadata("Moved Permanently", "The resource has been moved to a new permanent URI.", "➡️"));
-		responseMetadataMap.put(302, new ResponseMetadata("Found", "The resource is temporarily located at a different URI.", "📍"));
-		responseMetadataMap.put(303, new ResponseMetadata("See Other", "The response to the request can be found under a different URI using a GET method.", "👀"));
-		responseMetadataMap.put(304, new ResponseMetadata("Not Modified", "The resource has not been modified since the last request.", "🗂️"));
-		responseMetadataMap.put(305, new ResponseMetadata("Use Proxy", "The requested resource must be accessed through the proxy given by the server.", "🔌"));
-		responseMetadataMap.put(306, new ResponseMetadata("Switch Proxy", "Switch to a different proxy server for this request.", "🔀"));
-		responseMetadataMap.put(307, new ResponseMetadata("Temporary Redirect", "The request should be repeated with another URI, but future requests should use the original URI.", "🚧"));
-		responseMetadataMap.put(308, new ResponseMetadata("Permanent Redirect", "The resource has been permanently moved to a new URI, and future requests should use the new URI.", "🏠"));
-		responseMetadataMap.put(400, new ResponseMetadata("Bad Request", "Oops! The server could not understand your request. Please check your input and try again.", "🚫"));
-		responseMetadataMap.put(401, new ResponseMetadata("Unauthorized", "Sorry, you need to log in to access this page. Please check your credentials and try again.", "🔐"));
-		responseMetadataMap.put(402, new ResponseMetadata("Payment Required", "Payment is required to access this resource. Please ensure you have the necessary payment details.", "💳"));
-		responseMetadataMap.put(403, new ResponseMetadata("Forbidden", "Sorry, you don’t have permission to access this page. If you believe this is an error, contact support.", "🚷"));
-		responseMetadataMap.put(404, new ResponseMetadata("Not Found", "Sorry, the page you’re looking for doesn’t exist.", "🚫"));
-		responseMetadataMap.put(405, new ResponseMetadata("Method Not Allowed", "Sorry, the HTTP method used is not allowed for this resource. Please check your request and try again.", "🚫"));
-		responseMetadataMap.put(406, new ResponseMetadata("Not Acceptable", "The resource is capable of generating only content not acceptable according to the Accept headers.", "📜"));
-		responseMetadataMap.put(407, new ResponseMetadata("Proxy Authentication Required", "The client must first authenticate itself with the proxy.", "🔑"));
-		responseMetadataMap.put(408, new ResponseMetadata("Request Timeout", "The server timed out waiting for the request. Please try again later.", "⏳"));
-		responseMetadataMap.put(409, new ResponseMetadata("Conflict", "The request could not be completed due to a conflict with the current state of the resource.", "⚠️"));
-		responseMetadataMap.put(410, new ResponseMetadata("Gone", "The resource requested is no longer available and will not be available again.", "🕳️"));
-		responseMetadataMap.put(411, new ResponseMetadata("Length Required", "The request did not specify the length of its content, which is required by the server.", "📏"));
-		responseMetadataMap.put(412, new ResponseMetadata("Precondition Failed", "The server does not meet one of the preconditions that the requester put on the request.", "⚠️"));
-		responseMetadataMap.put(413, new ResponseMetadata("Payload Too Large", "The request is larger than the server is willing or able to process.", "📦"));
-		responseMetadataMap.put(414, new ResponseMetadata("URI Too Long", "The URI provided was too long for the server to process.", "🔗"));
-		responseMetadataMap.put(415, new ResponseMetadata("Unsupported Media Type", "The request entity has a media type which the server or resource does not support.", "🗃️"));
-		responseMetadataMap.put(416, new ResponseMetadata("Range Not Satisfiable", "The range specified by the Range header field in the request cannot be fulfilled.", "📉"));
-		responseMetadataMap.put(417, new ResponseMetadata("Expectation Failed", "The server cannot meet the requirements of the Expect request-header field.", "🤔"));
-		responseMetadataMap.put(418, new ResponseMetadata("I'm a teapot", "Any attempt to instruct a teapot to brew coffee should result in the error code \"418 I'm a teapot\".", "☕"));
-		responseMetadataMap.put(421, new ResponseMetadata("Misdirected Request", "The request was directed at a server that is not able to produce a response.", "🔄"));
-		responseMetadataMap.put(422, new ResponseMetadata("Unprocessable Entity", "The request was well-formed but was unable to be followed due to semantic errors.", "🛠️"));
-		responseMetadataMap.put(423, new ResponseMetadata("Locked", "The resource that is being accessed is locked.", "🔒"));
-		responseMetadataMap.put(424, new ResponseMetadata("Failed Dependency", "The request failed due to failure of a previous request.", "🔗"));
-		responseMetadataMap.put(425, new ResponseMetadata("Too Early", "The server is unwilling to risk processing a request that might be replayed.", "⏰"));
-		responseMetadataMap.put(426, new ResponseMetadata("Upgrade Required", "The server refuses to perform the request using the current protocol but might be willing to do so after the client upgrades to a different protocol.", "⚙️"));
-		responseMetadataMap.put(428, new ResponseMetadata("Precondition Required", "The origin server requires the request to be conditional.", "⚠️"));
-		responseMetadataMap.put(429, new ResponseMetadata("Too Many Requests", "The user has sent too many requests in a given amount of time.", "⛔"));
-		responseMetadataMap.put(431, new ResponseMetadata("Request Header Fields Too Large", "The server is unwilling to process the request because its header fields are too large.", "📋"));
-		responseMetadataMap.put(451, new ResponseMetadata("Unavailable For Legal Reasons", "The resource is unavailable due to legal reasons.", "⚖️"));
-		responseMetadataMap.put(500, new ResponseMetadata("Internal Server Error", "The server encountered an unexpected condition that prevented it from fulfilling the request.", "💣"));
-		responseMetadataMap.put(501, new ResponseMetadata("Not Implemented", "The server does not support the functionality required to fulfill the request.", "🔨"));
-		responseMetadataMap.put(502, new ResponseMetadata("Bad Gateway", "The server, while acting as a gateway or proxy, received an invalid response from the upstream server.", "🌉"));
-		responseMetadataMap.put(503, new ResponseMetadata("Service Unavailable", "The server is currently unable to handle the request due to temporary overloading or maintenance.", "🚧"));
-		responseMetadataMap.put(504, new ResponseMetadata("Gateway Timeout", "The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server.", "⏱️"));
-		responseMetadataMap.put(505, new ResponseMetadata("HTTP Version Not Supported", "The server does not support the HTTP protocol version that was used in the request.", "🔧"));
-		responseMetadataMap.put(506, new ResponseMetadata("Variant Also Negotiates", "The server has an internal configuration error: transparent content negotiation for the request results in a circular reference.", "🔄"));
-		responseMetadataMap.put(507, new ResponseMetadata("Insufficient Storage", "The server is unable to store the representation needed to complete the request.", "📦"));
-		responseMetadataMap.put(508, new ResponseMetadata("Loop Detected", "The server detected an infinite loop while processing a request with \"Depth: infinity\".", "🔁"));
-		responseMetadataMap.put(510, new ResponseMetadata("Not Extended", "Further extensions to the request are required for the server to fulfill it.", "🔧"));
-		responseMetadataMap.put(511, new ResponseMetadata("Network Authentication Required", "Network access requires authentication. Please log in.", "🔐"));
+		templateReplaceDataMap = new HashMap<>();
+		templateReplaceDataMap.put(100, new TemplateReplaceData("Continue", "The server has received the request headers, and the client should proceed to send the request body.", "⏩"));
+		templateReplaceDataMap.put(101, new TemplateReplaceData("Switching Protocol", "The server is switching protocols as requested by the client.", "🔄"));
+		templateReplaceDataMap.put(102, new TemplateReplaceData("Processing", null, null));
+		templateReplaceDataMap.put(103, new TemplateReplaceData("Early Hints", null, null));
+		templateReplaceDataMap.put(200, new TemplateReplaceData("OK", "The request has succeeded. Your server is running fine.", "✅"));
+		templateReplaceDataMap.put(201, new TemplateReplaceData("Created", "The request has succeeded, and a new resource has been created.", "🎉"));
+		templateReplaceDataMap.put(202, new TemplateReplaceData("Accepted", "The request has been accepted for processing, but the processing has not been completed.", "⏳"));
+		templateReplaceDataMap.put(203, new TemplateReplaceData("Non-Authoritative Information", "The request was successful but the information returned may be from a local or third-party copy.", "📝"));
+		templateReplaceDataMap.put(204, new TemplateReplaceData("No Content", null, null));
+		templateReplaceDataMap.put(205, new TemplateReplaceData("Reset Content", "The request was successful, and the client should reset the document view.", "🔄"));
+		templateReplaceDataMap.put(206, new TemplateReplaceData("Partial Content", "The server is delivering only part of the resource due to a range header sent by the client.", "📄"));
+		templateReplaceDataMap.put(207, new TemplateReplaceData("Multi-Status", "Multiple operations completed. Check individual results for details", "📋"));
+		templateReplaceDataMap.put(208, new TemplateReplaceData("Already Reported", "This information has already been reported.", "📄"));
+		templateReplaceDataMap.put(226, new TemplateReplaceData("IM Used", "Request fulfilled; modifications applied.", "🔧"));
+		templateReplaceDataMap.put(300, new TemplateReplaceData("Multiple Choice", "The request has more than one possible response.", "🔀"));
+		templateReplaceDataMap.put(301, new TemplateReplaceData("Moved Permanently", "The resource has been moved to a new permanent URI.", "➡️"));
+		templateReplaceDataMap.put(302, new TemplateReplaceData("Found", "The resource is temporarily located at a different URI.", "📍"));
+		templateReplaceDataMap.put(303, new TemplateReplaceData("See Other", "The response to the request can be found under a different URI using a GET method.", "👀"));
+		templateReplaceDataMap.put(304, new TemplateReplaceData("Not Modified", "The resource has not been modified since the last request.", "🗂️"));
+		templateReplaceDataMap.put(305, new TemplateReplaceData("Use Proxy", "The requested resource must be accessed through the proxy given by the server.", "🔌"));
+		templateReplaceDataMap.put(306, new TemplateReplaceData("Switch Proxy", "Switch to a different proxy server for this request.", "🔀"));
+		templateReplaceDataMap.put(307, new TemplateReplaceData("Temporary Redirect", "The request should be repeated with another URI, but future requests should use the original URI.", "🚧"));
+		templateReplaceDataMap.put(308, new TemplateReplaceData("Permanent Redirect", "The resource has been permanently moved to a new URI, and future requests should use the new URI.", "🏠"));
+		templateReplaceDataMap.put(400, new TemplateReplaceData("Bad Request", "Oops! The server could not understand your request. Please check your input and try again.", "🚫"));
+		templateReplaceDataMap.put(401, new TemplateReplaceData("Unauthorized", "Sorry, you need to log in to access this page. Please check your credentials and try again.", "🔐"));
+		templateReplaceDataMap.put(402, new TemplateReplaceData("Payment Required", "Payment is required to access this resource. Please ensure you have the necessary payment details.", "💳"));
+		templateReplaceDataMap.put(403, new TemplateReplaceData("Forbidden", "Sorry, you don’t have permission to access this page. If you believe this is an error, contact support.", "🚷"));
+		templateReplaceDataMap.put(404, new TemplateReplaceData("Not Found", "Sorry, the page you’re looking for doesn’t exist.", "🚫"));
+		templateReplaceDataMap.put(405, new TemplateReplaceData("Method Not Allowed", "Sorry, the HTTP method used is not allowed for this resource. Please check your request and try again.", "🚫"));
+		templateReplaceDataMap.put(406, new TemplateReplaceData("Not Acceptable", "The resource is capable of generating only content not acceptable according to the Accept headers.", "📜"));
+		templateReplaceDataMap.put(407, new TemplateReplaceData("Proxy Authentication Required", "The client must first authenticate itself with the proxy.", "🔑"));
+		templateReplaceDataMap.put(408, new TemplateReplaceData("Request Timeout", "The server timed out waiting for the request. Please try again later.", "⏳"));
+		templateReplaceDataMap.put(409, new TemplateReplaceData("Conflict", "The request could not be completed due to a conflict with the current state of the resource.", "⚠️"));
+		templateReplaceDataMap.put(410, new TemplateReplaceData("Gone", "The resource requested is no longer available and will not be available again.", "🕳️"));
+		templateReplaceDataMap.put(411, new TemplateReplaceData("Length Required", "The request did not specify the length of its content, which is required by the server.", "📏"));
+		templateReplaceDataMap.put(412, new TemplateReplaceData("Precondition Failed", "The server does not meet one of the preconditions that the requester put on the request.", "⚠️"));
+		templateReplaceDataMap.put(413, new TemplateReplaceData("Payload Too Large", "The request is larger than the server is willing or able to process.", "📦"));
+		templateReplaceDataMap.put(414, new TemplateReplaceData("URI Too Long", "The URI provided was too long for the server to process.", "🔗"));
+		templateReplaceDataMap.put(415, new TemplateReplaceData("Unsupported Media Type", "The request entity has a media type which the server or resource does not support.", "🗃️"));
+		templateReplaceDataMap.put(416, new TemplateReplaceData("Range Not Satisfiable", "The range specified by the Range header field in the request cannot be fulfilled.", "📉"));
+		templateReplaceDataMap.put(417, new TemplateReplaceData("Expectation Failed", "The server cannot meet the requirements of the Expect request-header field.", "🤔"));
+		templateReplaceDataMap.put(418, new TemplateReplaceData("I'm a teapot", "Any attempt to instruct a teapot to brew coffee should result in the error code \"418 I'm a teapot\".", "☕"));
+		templateReplaceDataMap.put(421, new TemplateReplaceData("Misdirected Request", "The request was directed at a server that is not able to produce a response.", "🔄"));
+		templateReplaceDataMap.put(422, new TemplateReplaceData("Unprocessable Entity", "The request was well-formed but was unable to be followed due to semantic errors.", "🛠️"));
+		templateReplaceDataMap.put(423, new TemplateReplaceData("Locked", "The resource that is being accessed is locked.", "🔒"));
+		templateReplaceDataMap.put(424, new TemplateReplaceData("Failed Dependency", "The request failed due to failure of a previous request.", "🔗"));
+		templateReplaceDataMap.put(425, new TemplateReplaceData("Too Early", "The server is unwilling to risk processing a request that might be replayed.", "⏰"));
+		templateReplaceDataMap.put(426, new TemplateReplaceData("Upgrade Required", "The server refuses to perform the request using the current protocol but might be willing to do so after the client upgrades to a different protocol.", "⚙️"));
+		templateReplaceDataMap.put(428, new TemplateReplaceData("Precondition Required", "The origin server requires the request to be conditional.", "⚠️"));
+		templateReplaceDataMap.put(429, new TemplateReplaceData("Too Many Requests", "The user has sent too many requests in a given amount of time.", "⛔"));
+		templateReplaceDataMap.put(431, new TemplateReplaceData("Request Header Fields Too Large", "The server is unwilling to process the request because its header fields are too large.", "📋"));
+		templateReplaceDataMap.put(451, new TemplateReplaceData("Unavailable For Legal Reasons", "The resource is unavailable due to legal reasons.", "⚖️"));
+		templateReplaceDataMap.put(500, new TemplateReplaceData("Internal Server Error", "The server encountered an unexpected condition that prevented it from fulfilling the request.", "💣"));
+		templateReplaceDataMap.put(501, new TemplateReplaceData("Not Implemented", "The server does not support the functionality required to fulfill the request.", "🔨"));
+		templateReplaceDataMap.put(502, new TemplateReplaceData("Bad Gateway", "The server, while acting as a gateway or proxy, received an invalid response from the upstream server.", "🌉"));
+		templateReplaceDataMap.put(503, new TemplateReplaceData("Service Unavailable", "The server is currently unable to handle the request due to temporary overloading or maintenance.", "🚧"));
+		templateReplaceDataMap.put(504, new TemplateReplaceData("Gateway Timeout", "The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server.", "⏱️"));
+		templateReplaceDataMap.put(505, new TemplateReplaceData("HTTP Version Not Supported", "The server does not support the HTTP protocol version that was used in the request.", "🔧"));
+		templateReplaceDataMap.put(506, new TemplateReplaceData("Variant Also Negotiates", "The server has an internal configuration error: transparent content negotiation for the request results in a circular reference.", "🔄"));
+		templateReplaceDataMap.put(507, new TemplateReplaceData("Insufficient Storage", "The server is unable to store the representation needed to complete the request.", "📦"));
+		templateReplaceDataMap.put(508, new TemplateReplaceData("Loop Detected", "The server detected an infinite loop while processing a request with \"Depth: infinity\".", "🔁"));
+		templateReplaceDataMap.put(510, new TemplateReplaceData("Not Extended", "Further extensions to the request are required for the server to fulfill it.", "🔧"));
+		templateReplaceDataMap.put(511, new TemplateReplaceData("Network Authentication Required", "Network access requires authentication. Please log in.", "🔐"));
 	}
 
 	/**
@@ -104,19 +104,19 @@ public class Response
 	 */
 	public Response(int statusCode)
 	{
-		ResponseMetadata responseMetadata = responseMetadataMap.getOrDefault(statusCode, new ResponseMetadata("Unknown code", null, null));
+		TemplateReplaceData templateReplaceData = templateReplaceDataMap.getOrDefault(statusCode, new TemplateReplaceData("Unknown code", null, null));
 		this.statusCode = statusCode;
-		this.statusText = responseMetadata.statusText;
+		this.statusText = templateReplaceData.statusText;
 		this.headers = new HashMap<>();
 
-		if (responseMetadata.message != null)
+		if (templateReplaceData.message != null)
 		{
 			addHeader("Content-Type", "text/html");
 			this.body = responseBodyTemplate
 					.replace("${code}", String.valueOf(statusCode))
 					.replace("${title}", statusText)
-					.replace("${message}", responseMetadata.message)
-					.replace("${emoji}", responseMetadata.emoji)
+					.replace("${message}", templateReplaceData.message)
+					.replace("${emoji}", templateReplaceData.emoji)
 					.getBytes(StandardCharsets.UTF_8);
 		}
 		else
